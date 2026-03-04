@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LWC Training — WFP Donor Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* WFP Brand Colours */
+    --wfp-blue: #0099D8;
+    --wfp-blue-dark: #007AB8;
+    --wfp-blue-deeper: #005A8E;
+    --wfp-navy: #1A2B4A;
+    --wfp-black: #1C1C1C;
+
+    /* Light theme */
+    --bg: #F4F6F8;
+    --surface: #FFFFFF;
+    --surface2: #EEF2F6;
+    --border: #D0DCE8;
+    --text: #1A2B4A;
+    --muted: #5A7490;
+
+    /* Utility */
+    --code-bg: #1A2B4A;
+    --green: #2E9E5B;
+    --green-bg: #E8F5EE;
+    --red: #D63838;
+    --red-bg: #FEF0F0;
+    --amber: #E07B00;
+    --amber-bg: #FFF4E0;
+    --purple: #6B3FA0;
+    --purple-bg: #F3EEF9;
+    --teal: #0099D8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    border-bottom: 3px solid var(--wfp-blue);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,99,176,0.08);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo-badge {
+    background: var(--wfp-blue);
+    color: #fff;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 900;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .logo-text {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--wfp-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .logo-text span {
+    color: var(--wfp-blue);
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    width: 180px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--wfp-blue);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.67rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    min-height: calc(100vh - 64px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 1.75rem 0;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    background: #fff;
+  }
+
+  .sidebar-section {
+    padding: 0 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .sidebar-label {
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    padding-left: 0.5rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    margin-bottom: 2px;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { color: var(--wfp-blue); background: #EBF7FD; }
+  .nav-item.active { color: #fff; background: var(--wfp-blue); border-color: var(--wfp-blue); }
+  .nav-item.done { color: var(--green); }
+  .nav-item.done::after { content: '✓'; margin-left: auto; font-size: 0.75rem; font-weight: 700; }
+
+  .nav-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .active .nav-num { background: rgba(255,255,255,0.25); color: #fff; }
+  .done .nav-num { background: var(--green-bg); color: var(--green); }
+
+  /* MAIN */
+  .main { padding: 3rem 4rem; max-width: 900px; }
+
+  .module { display: none; }
+  .module.active { display: block; animation: fadeUp 0.25s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .module-tag {
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--wfp-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.4rem;
+  }
+
+  h1 {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 900;
+    font-size: 2.5rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    color: var(--wfp-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  h2 {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--wfp-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 2.5rem 0 0.75rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+  }
+
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 2rem; }
+
+  h3 {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--wfp-blue);
+    margin: 1.5rem 0 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  p { margin-bottom: 1rem; color: #3D5168; font-size: 0.95rem; }
+
+  .intro {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 2rem;
+    font-weight: 500;
+  }
+
+  /* CODE */
+  pre {
+    background: var(--code-bg);
+    border: none;
+    border-left: 4px solid var(--wfp-blue);
+    border-radius: 0 6px 6px 0;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+    position: relative;
+  }
+
+  pre .file-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.3);
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.75;
+    color: #C8D8E8;
+  }
+
+  p code, li code {
+    background: #EBF7FD;
+    padding: 0.15em 0.45em;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    color: var(--wfp-blue-deeper);
+    border: 1px solid #C0DFF0;
+    font-weight: 500;
+  }
+
+  /* syntax colors — on dark bg */
+  .kw { color: #79B8FF; }
+  .fn { color: #56CCF2; }
+  .str { color: #6EDB8F; }
+  .cmt { color: #4A6280; font-style: italic; }
+  .attr { color: #FFD080; }
+  .tag { color: #FF9A7A; }
+  .val { color: #FFD080; }
+  .dec { color: #F78AFF; }
+
+  /* CALLOUTS */
+  .callout {
+    border-left: 4px solid var(--wfp-blue);
+    background: #EBF7FD;
+    padding: 1rem 1.25rem;
+    border-radius: 0 6px 6px 0;
+    margin: 1.25rem 0;
+  }
+  .callout.tip { border-color: var(--green); background: var(--green-bg); }
+  .callout.warn { border-color: var(--amber); background: var(--amber-bg); }
+  .callout.info { border-color: var(--purple); background: var(--purple-bg); }
+
+  .callout-title {
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.4rem;
+    color: var(--wfp-blue);
+  }
+  .callout.tip .callout-title { color: var(--green); }
+  .callout.warn .callout-title { color: var(--amber); }
+  .callout.info .callout-title { color: var(--purple); }
+
+  .callout p { font-size: 0.88rem; margin: 0; color: var(--text); }
+
+  /* QUIZ */
+  .quiz {
+    background: var(--wfp-navy);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .quiz-title {
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--wfp-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.75rem;
+  }
+
+  .quiz p { font-family: 'Barlow', sans-serif; font-size: 0.97rem; font-weight: 600; color: #fff; margin-bottom: 1rem; }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+
+  .quiz-opt {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.65);
+    transition: all 0.15s;
+    text-align: left;
+  }
+
+  .quiz-opt:hover { border-color: var(--wfp-blue); color: #fff; background: rgba(0,153,216,0.15); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(46,158,91,0.2); color: #6EDB8F; }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(214,56,56,0.15); color: #FF9A9A; }
+
+  .quiz-feedback {
+    margin-top: 0.75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.77rem;
+    display: none;
+    padding: 0.6rem 0.85rem;
+    border-radius: 4px;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok { color: #6EDB8F; background: rgba(46,158,91,0.15); }
+  .quiz-feedback.nope { color: #FF9A9A; background: rgba(214,56,56,0.12); }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.85rem; }
+  th {
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #fff;
+    padding: 0.6rem 1rem;
+    text-align: left;
+    background: var(--wfp-navy);
+  }
+  td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: #3D5168; vertical-align: top; background: #fff; }
+  tr:nth-child(even) td { background: #F8FAFC; }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: 0.78rem; }
+
+  /* MODULE NAV */
+  .module-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+  }
+
+  .btn {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 2px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-ghost:hover { border-color: var(--wfp-blue); color: var(--wfp-blue); }
+
+  .btn-primary {
+    background: var(--wfp-blue);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--wfp-blue-dark); }
+
+  ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+  li { color: #3D5168; font-size: 0.92rem; margin-bottom: 0.4rem; }
+  li strong { color: var(--wfp-navy); font-weight: 700; }
+
+  .pill {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.2em 0.6em;
+    border-radius: 3px;
+    margin: 0 2px;
+    font-weight: 500;
+  }
+  .pill-blue { background: #EBF7FD; color: var(--wfp-blue); border: 1px solid #C0DFF0; }
+  .pill-yellow { background: var(--amber-bg); color: var(--amber); border: 1px solid #FFD9A0; }
+  .pill-green { background: var(--green-bg); color: var(--green); border: 1px solid #B0DFC0; }
+  .pill-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid #D0B8F0; }
+
+  .diagram {
+    background: var(--wfp-navy);
+    border-left: 4px solid var(--wfp-blue);
+    border-radius: 0 6px 6px 0;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.9;
+  }
+
+  .diagram .d-accent { color: #FFD080; }
+  .diagram .d-blue { color: #56CCF2; }
+  .diagram .d-green { color: #6EDB8F; }
+  .diagram .d-purple { color: #F78AFF; }
+
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-badge">UN<br>WFP</div>
+    <div>
+      <div class="logo-text">World Food <span>Programme</span></div>
+      <div style="font-size:0.62rem;color:var(--muted);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">LWC Developer Training</div>
+    </div>
+  </div>
+  <div>
+    <div class="progress-label">Course Progress</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Modules</div>
+      <a class="nav-item active" data-module="0" onclick="goTo(0)">
+        <span class="nav-num">0</span> Introduction
+      </a>
+      <a class="nav-item" data-module="1" onclick="goTo(1)">
+        <span class="nav-num">1</span> LWC Fundamentals
+      </a>
+      <a class="nav-item" data-module="2" onclick="goTo(2)">
+        <span class="nav-num">2</span> Data & Wire Adapters
+      </a>
+      <a class="nav-item" data-module="3" onclick="goTo(3)">
+        <span class="nav-num">3</span> Experience Cloud
+      </a>
+      <a class="nav-item" data-module="4" onclick="goTo(4)">
+        <span class="nav-num">4</span> Testing LWCs
+      </a>
+      <a class="nav-item" data-module="5" onclick="goTo(5)">
+        <span class="nav-num">5</span> Donor Portal Tour
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Reference</div>
+      <a class="nav-item" onclick="goTo(6)" data-module="6"><span class="nav-num" style="font-size:0.6rem">⌘</span> Cheat Sheet</a>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- MODULE 0: INTRO -->
+    <section class="module active" id="module-0">
+      <div class="module-tag">Welcome</div>
+      <h1>LWC for Testers</h1>
+      <p class="intro">This course gives you a working mental model of Lightning Web Components — specifically in the context of WFP's Donor Portal. You don't need Salesforce experience. You do need your existing testing instincts, which transfer well.</p>
+
+      <h2>What you'll learn</h2>
+      <table>
+        <tr><th>Module</th><th>Topic</th><th>Time</th></tr>
+        <tr><td><span class="pill pill-blue">1</span></td><td>LWC structure — HTML, JS, CSS files</td><td>~20 min</td></tr>
+        <tr><td><span class="pill pill-blue">2</span></td><td>How components fetch Salesforce data</td><td>~20 min</td></tr>
+        <tr><td><span class="pill pill-blue">3</span></td><td>Experience Cloud / portal context</td><td>~15 min</td></tr>
+        <tr><td><span class="pill pill-blue">4</span></td><td>Testing strategies — Jest + manual</td><td>~20 min</td></tr>
+        <tr><td><span class="pill pill-blue">5</span></td><td>Donor Portal component walkthrough</td><td>~10 min</td></tr>
+      </table>
+
+      <h2>The right mental model</h2>
+      <p>If you've tested web applications before, you already understand components. Think of LWC like a React or Angular component — a self-contained unit with:</p>
+      <ul>
+        <li><strong>Template (HTML)</strong> — what renders in the browser</li>
+        <li><strong>Controller (JS)</strong> — state and behaviour</li>
+        <li><strong>Style (CSS)</strong> — scoped styles, never leak out</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-title">🌍 WFP Context</div>
+        <p>The Donor Portal is built on Salesforce Experience Cloud. Donors log in, view their giving history, download tax receipts, and manage their recurring gifts. Every screen is an LWC — or a composition of several LWCs.</p>
+      </div>
+
+      <div class="module-nav">
+        <span></span>
+        <button class="btn btn-primary" onclick="goTo(1)">Start Module 1 →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 1: FUNDAMENTALS -->
+    <section class="module" id="module-1">
+      <div class="module-tag">Module 1</div>
+      <h1>LWC Fundamentals</h1>
+      <p class="intro">Every LWC lives in a folder. That folder always contains three files with the same name. Understanding this structure is 80% of reading any component.</p>
+
+      <h2>The Component Bundle</h2>
+      <div class="diagram">
+        <span class="d-accent">donorSummary/</span><br>
+        &nbsp;&nbsp;├── <span class="d-blue">donorSummary.html</span>&nbsp;&nbsp;&nbsp;← <span class="d-green">template (what the user sees)</span><br>
+        &nbsp;&nbsp;├── <span class="d-blue">donorSummary.js</span>&nbsp;&nbsp;&nbsp;&nbsp;← <span class="d-purple">controller (logic &amp; state)</span><br>
+        &nbsp;&nbsp;├── <span class="d-blue">donorSummary.css</span>&nbsp;&nbsp;&nbsp;← scoped styles<br>
+        &nbsp;&nbsp;└── <span class="d-blue">donorSummary.js-meta.xml</span>  ← metadata (where it can deploy)
+      </div>
+
+      <h2>The HTML Template</h2>
+      <p>LWC templates always wrap in <code>&lt;template&gt;</code>. Inside, it's mostly regular HTML — but with a few Salesforce directives for conditionals and loops.</p>
+
+      <pre><code><span class="tag">&lt;template&gt;</span>
+  <span class="cmt">&lt;!-- Conditional rendering --&gt;</span>
+  <span class="tag">&lt;template</span> <span class="attr">if:true</span>=<span class="str">{isLoggedIn}</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Welcome back, <span class="str">{donorName}</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/template&gt;</span>
+
+  <span class="cmt">&lt;!-- Loop --&gt;</span>
+  <span class="tag">&lt;template</span> <span class="attr">for:each</span>=<span class="str">{gifts}</span> <span class="attr">for:item</span>=<span class="str">"gift"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;p</span> <span class="attr">key</span>=<span class="str">{gift.Id}</span><span class="tag">&gt;</span><span class="str">{gift.Amount__c}</span><span class="tag">&lt;/p&gt;</span>
+  <span class="tag">&lt;/template&gt;</span>
+
+  <span class="cmt">&lt;!-- Event handler --&gt;</span>
+  <span class="tag">&lt;button</span> <span class="attr">onclick</span>=<span class="str">{handleDownload}</span><span class="tag">&gt;</span>Download Receipt<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+<span class="file-label">donorSummary.html</span></code></pre>
+
+      <div class="callout">
+        <div class="callout-title">Key pattern</div>
+        <p>Curly braces <code>{variableName}</code> bind to JS properties. If the JS property changes, the HTML updates automatically — no DOM manipulation needed.</p>
+      </div>
+
+      <h2>The JavaScript Controller</h2>
+      <p>Every JS file exports a class that extends <code>LightningElement</code>. Properties you want bound to the template just need to be declared — or decorated.</p>
+
+      <pre><code><span class="kw">import</span> { LightningElement, <span class="fn">track</span>, <span class="fn">api</span>, <span class="fn">wire</span> } <span class="kw">from</span> <span class="str">'lwc'</span>;
+
+<span class="kw">export default class</span> <span class="fn">DonorSummary</span> <span class="kw">extends</span> <span class="fn">LightningElement</span> {
+
+  <span class="cmt">// @api — public prop, set by parent component</span>
+  <span class="dec">@api</span> donorId;
+
+  <span class="cmt">// @track — reactive private state (object/array)</span>
+  <span class="dec">@track</span> gifts = [];
+
+  <span class="cmt">// plain property — also reactive for primitives</span>
+  donorName = <span class="str">''</span>;
+  isLoggedIn = <span class="kw">false</span>;
+
+  <span class="cmt">// Lifecycle hook — runs after component renders</span>
+  <span class="fn">connectedCallback</span>() {
+    console.log(<span class="str">'Component mounted'</span>);
+  }
+
+  <span class="cmt">// Event handler</span>
+  <span class="fn">handleDownload</span>() {
+    <span class="cmt">// fire an event, call Apex, etc.</span>
+  }
+}
+<span class="file-label">donorSummary.js</span></code></pre>
+
+      <h2>Decorators at a glance</h2>
+      <table>
+        <tr><th>Decorator</th><th>Purpose</th><th>Direction</th></tr>
+        <tr><td><code>@api</code></td><td>Public property or method — parent can set it</td><td>Parent → Child</td></tr>
+        <tr><td><code>@track</code></td><td>Deep reactivity for objects/arrays</td><td>Internal</td></tr>
+        <tr><td><code>@wire</code></td><td>Bind a wire adapter (Salesforce data)</td><td>Salesforce → Component</td></tr>
+      </table>
+
+      <h2>Lifecycle Hooks</h2>
+      <p>These are the moments you'll care about most when testing:</p>
+      <table>
+        <tr><th>Hook</th><th>When it fires</th><th>Common use</th></tr>
+        <tr><td><code>constructor()</code></td><td>Component instantiated</td><td>Rarely needed</td></tr>
+        <tr><td><code>connectedCallback()</code></td><td>Added to DOM</td><td>Fetch data, set up listeners</td></tr>
+        <tr><td><code>renderedCallback()</code></td><td>After each render</td><td>DOM manipulation (careful!)</td></tr>
+        <tr><td><code>disconnectedCallback()</code></td><td>Removed from DOM</td><td>Cleanup listeners</td></tr>
+      </table>
+
+      <div class="callout tip">
+        <div class="callout-title">Tester's tip</div>
+        <p>If a component behaves inconsistently on load, suspect <code>connectedCallback()</code>. Race conditions between async Apex calls and rendering are a common bug source in the portal.</p>
+      </div>
+
+      <h2>Scoped CSS</h2>
+      <p>CSS in an LWC only applies to that component. You can't accidentally override styles from another component. The platform adds a unique attribute to all elements at build time to enforce this.</p>
+
+      <pre><code><span class="cmt">/* Only affects elements inside THIS component */</span>
+<span class="fn">.receipt-card</span> {
+  border: <span class="val">1px solid #e0e0e0</span>;
+  border-radius: <span class="val">8px</span>;
+  padding: <span class="val">1rem</span>;
+}
+
+<span class="cmt">/* Use :host to style the component root element */</span>
+<span class="fn">:host</span> {
+  display: <span class="val">block</span>;
+}
+<span class="file-label">donorSummary.css</span></code></pre>
+
+      <div class="quiz">
+        <div class="quiz-title">🧪 Quick Check</div>
+        <p>A parent component wants to pass a <code>donorId</code> into a child component. Which decorator should the child declare it with?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this, false)">@track</button>
+          <button class="quiz-opt" onclick="answer(this, true)">@api</button>
+          <button class="quiz-opt" onclick="answer(this, false)">@wire</button>
+          <button class="quiz-opt" onclick="answer(this, false)">No decorator needed</button>
+        </div>
+        <div class="quiz-feedback" id="qf-current"></div>
+      </div>
+
+      <div class="module-nav">
+        <button class="btn btn-ghost" onclick="goTo(0)">← Back</button>
+        <button class="btn btn-primary" onclick="goTo(2)">Module 2: Data & Wire →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 2: DATA & WIRE -->
+    <section class="module" id="module-2">
+      <div class="module-tag">Module 2</div>
+      <h1>Data &amp; Wire Adapters</h1>
+      <p class="intro">Components need Salesforce data. There are two ways to get it: declaratively via <code>@wire</code>, or imperatively by calling an Apex method like a function. Each has trade-offs.</p>
+
+      <h2>The @wire decorator</h2>
+      <p><code>@wire</code> subscribes a component to a data source. When the data changes, the component re-renders automatically. Think of it like a reactive database query.</p>
+
+      <pre><code><span class="kw">import</span> { LightningElement, <span class="fn">wire</span>, <span class="fn">api</span> } <span class="kw">from</span> <span class="str">'lwc'</span>;
+<span class="kw">import</span> { <span class="fn">getRecord</span> } <span class="kw">from</span> <span class="str">'lightning/uiRecordApi'</span>;
+<span class="kw">import</span> FIRST_NAME <span class="kw">from</span> <span class="str">'@salesforce/schema/Contact.FirstName'</span>;
+<span class="kw">import</span> LAST_NAME <span class="kw">from</span> <span class="str">'@salesforce/schema/Contact.LastName'</span>;
+
+<span class="kw">export default class</span> <span class="fn">DonorHeader</span> <span class="kw">extends</span> <span class="fn">LightningElement</span> {
+  <span class="dec">@api</span> recordId;
+
+  <span class="cmt">// Wire: auto-fetches Contact record when recordId is set</span>
+  <span class="dec">@wire</span>(<span class="fn">getRecord</span>, { recordId: <span class="str">'$recordId'</span>, fields: [FIRST_NAME, LAST_NAME] })
+  contact;
+
+  <span class="kw">get</span> <span class="fn">fullName</span>() {
+    <span class="kw">return</span> <span class="str">`<span class="val">${</span><span class="kw">this</span>.contact?.data?.fields?.FirstName?.value<span class="val">}</span> <span class="val">${</span><span class="kw">this</span>.contact?.data?.fields?.LastName?.value<span class="val">}</span>`</span>;
+  }
+}
+<span class="file-label">donorHeader.js</span></code></pre>
+
+      <div class="callout">
+        <div class="callout-title">The $ prefix</div>
+        <p><code>'$recordId'</code> means "reactively re-run this wire whenever <code>recordId</code> changes." Without the <code>$</code>, it runs once with the initial value.</p>
+      </div>
+
+      <h2>Wire result shape</h2>
+      <p>Wire adapters always return an object with <code>data</code> and <code>error</code>. Always check both.</p>
+
+      <pre><code><span class="cmt">// Two ways to receive wired data:</span>
+
+<span class="cmt">// 1. As a property (access via .data / .error)</span>
+<span class="dec">@wire</span>(<span class="fn">getRecord</span>, { recordId: <span class="str">'$recordId'</span>, fields: [FIRST_NAME] })
+contact;  <span class="cmt">// this.contact.data, this.contact.error</span>
+
+<span class="cmt">// 2. As a function (called with result)</span>
+<span class="dec">@wire</span>(<span class="fn">getRecord</span>, { recordId: <span class="str">'$recordId'</span>, fields: [FIRST_NAME] })
+<span class="fn">wiredContact</span>({ data, error }) {
+  <span class="kw">if</span> (data) { <span class="kw">this</span>.donorName = data.fields.FirstName.value; }
+  <span class="kw">if</span> (error) { console.error(error); }
+}
+<span class="file-label">donorHeader.js</span></code></pre>
+
+      <h2>Calling Apex directly (Imperative)</h2>
+      <p>For operations like form submissions, button clicks, or anything that needs manual control — use imperative Apex.</p>
+
+      <pre><code><span class="kw">import</span> { LightningElement } <span class="kw">from</span> <span class="str">'lwc'</span>;
+<span class="kw">import</span> <span class="fn">getGiftHistory</span> <span class="kw">from</span> <span class="str">'@salesforce/apex/DonorPortalController.getGiftHistory'</span>;
+
+<span class="kw">export default class</span> <span class="fn">GiftHistory</span> <span class="kw">extends</span> <span class="fn">LightningElement</span> {
+  gifts = [];
+  isLoading = <span class="kw">false</span>;
+  error;
+
+  <span class="fn">connectedCallback</span>() {
+    <span class="kw">this</span>.<span class="fn">loadGifts</span>();
+  }
+
+  <span class="kw">async</span> <span class="fn">loadGifts</span>() {
+    <span class="kw">this</span>.isLoading = <span class="kw">true</span>;
+    <span class="kw">try</span> {
+      <span class="kw">this</span>.gifts = <span class="kw">await</span> <span class="fn">getGiftHistory</span>();
+    } <span class="kw">catch</span> (e) {
+      <span class="kw">this</span>.error = e.body?.message;
+    } <span class="kw">finally</span> {
+      <span class="kw">this</span>.isLoading = <span class="kw">false</span>;
+    }
+  }
+}
+<span class="file-label">giftHistory.js</span></code></pre>
+
+      <h2>Wire vs Imperative — when to use each</h2>
+      <table>
+        <tr><th></th><th>@wire</th><th>Imperative</th></tr>
+        <tr><td>Best for</td><td>Read-only data, auto-refresh</td><td>Actions, conditionally fetched data</td></tr>
+        <tr><td>Triggers</td><td>Automatically on param change</td><td>You control when</td></tr>
+        <tr><td>Error handling</td><td><code>.error</code> property</td><td><code>try/catch</code></td></tr>
+        <tr><td>In tests</td><td>Mock the adapter</td><td>Mock the import</td></tr>
+      </table>
+
+      <div class="callout warn">
+        <div class="callout-title">⚠ Common bug in the portal</div>
+        <p>Wired calls run before <code>connectedCallback()</code>. If a component depends on wired data being ready inside <code>connectedCallback()</code>, it will be undefined. Always use the wired function form or a getter with null checks.</p>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-title">🧪 Quick Check</div>
+        <p>A donor clicks "Cancel Recurring Gift". Which data pattern should handle the Apex call?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this, false)">@wire — automatic</button>
+          <button class="quiz-opt" onclick="answer(this, true)">Imperative — called on button click</button>
+          <button class="quiz-opt" onclick="answer(this, false)">Either works, no difference</button>
+        </div>
+        <div class="quiz-feedback" id="qf-current"></div>
+      </div>
+
+      <div class="module-nav">
+        <button class="btn btn-ghost" onclick="goTo(1)">← Module 1</button>
+        <button class="btn btn-primary" onclick="goTo(3)">Module 3: Experience Cloud →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 3: EXPERIENCE CLOUD -->
+    <section class="module" id="module-3">
+      <div class="module-tag">Module 3</div>
+      <h1>Experience Cloud</h1>
+      <p class="intro">Experience Cloud is the Salesforce platform for building external-facing sites — portals, communities, help centres. The Donor Portal is one of these sites. It changes how components behave in some important ways.</p>
+
+      <h2>How the portal is structured</h2>
+      <div class="diagram">
+        <span class="d-accent">Experience Cloud Site (Donor Portal)</span><br>
+        &nbsp;&nbsp;└── <span class="d-blue">Pages</span> (Home, My Gifts, Tax Receipts, Profile)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="d-purple">Regions</span> (header, body, footer)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="d-green">LWC Components</span> (dropped in via Builder)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="d-blue">Child LWCs</span> (composed inside components)<br>
+        <br>
+        Data layer:&nbsp;&nbsp;<span class="d-accent">Salesforce Core Org</span> &lt;─── Experience Cloud fetches via Apex / Wire
+      </div>
+
+      <h2>Guest vs Authenticated Users</h2>
+      <p>Experience Cloud has two types of page visitors. This matters enormously for testing.</p>
+      <table>
+        <tr><th>Type</th><th>Who</th><th>Record access</th><th>Apex context</th></tr>
+        <tr><td><span class="pill pill-yellow">Guest</span></td><td>Not logged in</td><td>Very limited (public data only)</td><td>Runs as Guest User profile</td></tr>
+        <tr><td><span class="pill pill-green">Authenticated</span></td><td>Logged in donor</td><td>Their own records</td><td>Runs as their Contact's linked User</td></tr>
+      </table>
+
+      <div class="callout warn">
+        <div class="callout-title">⚠ Sharing rules matter</div>
+        <p>If a donor can't see their gifts, it's almost always a sharing or profile permissions issue — not a bug in the LWC code. Always check object/field permissions and sharing rules before debugging the component.</p>
+      </div>
+
+      <h2>OTP Authentication (Donor Portal specific)</h2>
+      <p>WFP's Donor Portal uses a passwordless One-Time Password (OTP) login flow. This is a custom LWC authentication sequence:</p>
+      <ol>
+        <li>Donor enters their email</li>
+        <li>An Apex controller generates and sends an OTP via email</li>
+        <li>Donor enters the code — a second Apex call validates it</li>
+        <li>On success, the session is established and donor is redirected</li>
+      </ol>
+
+      <div class="callout tip">
+        <div class="callout-title">Testing tip</div>
+        <p>OTP flows are time-sensitive. When testing, check if there's a backdoor test user or a bypass flag in the Custom Metadata. Never test with real donor emails in sandbox.</p>
+      </div>
+
+      <h2>CurrentPageReference — knowing where you are</h2>
+      <p>Components in Experience Cloud often need to know the current page or URL parameters. They use <code>CurrentPageReference</code> for this:</p>
+
+      <pre><code><span class="kw">import</span> { <span class="fn">wire</span>, LightningElement } <span class="kw">from</span> <span class="str">'lwc'</span>;
+<span class="kw">import</span> { <span class="fn">CurrentPageReference</span> } <span class="kw">from</span> <span class="str">'lightning/navigation'</span>;
+
+<span class="kw">export default class</span> <span class="fn">DonorPortalRouter</span> <span class="kw">extends</span> <span class="fn">LightningElement</span> {
+  <span class="dec">@wire</span>(<span class="fn">CurrentPageReference</span>)
+  pageRef;
+
+  <span class="kw">get</span> <span class="fn">currentSection</span>() {
+    <span class="kw">return</span> <span class="kw">this</span>.pageRef?.state?.section;
+  }
+}
+<span class="file-label">donorPortalRouter.js</span></code></pre>
+
+      <h2>NavigationMixin — navigating between pages</h2>
+      <p>Components navigate programmatically using <code>NavigationMixin</code>:</p>
+
+      <pre><code><span class="kw">import</span> { LightningElement } <span class="kw">from</span> <span class="str">'lwc'</span>;
+<span class="kw">import</span> { <span class="fn">NavigationMixin</span> } <span class="kw">from</span> <span class="str">'lightning/navigation'</span>;
+
+<span class="kw">export default class</span> <span class="fn">ReceiptButton</span> <span class="kw">extends</span> <span class="fn">NavigationMixin</span>(<span class="fn">LightningElement</span>) {
+  <span class="fn">goToReceipts</span>() {
+    <span class="kw">this</span>[<span class="fn">NavigationMixin.Navigate</span>]({
+      type: <span class="str">'comm__namedPage'</span>,
+      attributes: { name: <span class="str">'Tax_Receipts__c'</span> }
+    });
+  }
+}
+<span class="file-label">receiptButton.js</span></code></pre>
+
+      <h2>Labels & Multilingual support</h2>
+      <p>The Donor Portal supports multiple languages (CA, NL, FR and others). Custom Labels are used for all user-facing strings:</p>
+
+      <pre><code><span class="kw">import</span> LABEL_WELCOME <span class="kw">from</span> <span class="str">'@salesforce/label/c.DP_Welcome_Message'</span>;
+<span class="kw">import</span> LABEL_DOWNLOAD <span class="kw">from</span> <span class="str">'@salesforce/label/c.DP_Download_Receipt'</span>;
+
+<span class="kw">export default class</span> <span class="fn">DonorPortalHeader</span> <span class="kw">extends</span> <span class="fn">LightningElement</span> {
+  label = {
+    welcome: LABEL_WELCOME,
+    download: LABEL_DOWNLOAD
+  };
+}
+<span class="file-label">donorPortalHeader.js</span></code></pre>
+      <p>In the template: <code>{label.welcome}</code> — Salesforce automatically serves the correct translation based on user locale.</p>
+
+      <div class="quiz">
+        <div class="quiz-title">🧪 Quick Check</div>
+        <p>A donor reports they can see their name in the header but the gift history table is empty. What's the most likely cause?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this, false)">The @wire decorator is broken</button>
+          <button class="quiz-opt" onclick="answer(this, false)">A JS syntax error in the component</button>
+          <button class="quiz-opt" onclick="answer(this, true)">Sharing rules or field permissions blocking the Apex query</button>
+          <button class="quiz-opt" onclick="answer(this, false)">The multilingual label is missing</button>
+        </div>
+        <div class="quiz-feedback" id="qf-current"></div>
+      </div>
+
+      <div class="module-nav">
+        <button class="btn btn-ghost" onclick="goTo(2)">← Module 2</button>
+        <button class="btn btn-primary" onclick="goTo(4)">Module 4: Testing →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 4: TESTING -->
+    <section class="module" id="module-4">
+      <div class="module-tag">Module 4</div>
+      <h1>Testing LWCs</h1>
+      <p class="intro">Your testing background is your superpower here. LWC testing has two layers: automated unit tests with Jest, and manual/integration testing in the sandbox. Both matter.</p>
+
+      <h2>Jest — Unit Testing LWCs</h2>
+      <p>Salesforce provides <code>@salesforce/sfdx-lwc-jest</code> — a Jest preset that stubs Salesforce-specific imports so you can test components in Node.js without a Salesforce org.</p>
+
+      <pre><code><span class="cmt">// donorSummary.test.js</span>
+<span class="kw">import</span> { createElement } <span class="kw">from</span> <span class="str">'lwc'</span>;
+<span class="kw">import</span> <span class="fn">DonorSummary</span> <span class="kw">from</span> <span class="str">'c/donorSummary'</span>;
+
+describe(<span class="str">'c-donor-summary'</span>, () => {
+
+  <span class="cmt">// Always clean up after each test</span>
+  afterEach(() => {
+    <span class="kw">while</span> (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+  });
+
+  it(<span class="str">'renders donor name when donorId is set'</span>, () => {
+    <span class="cmt">// 1. Create component</span>
+    <span class="kw">const</span> el = <span class="fn">createElement</span>(<span class="str">'c-donor-summary'</span>, { is: <span class="fn">DonorSummary</span> });
+    el.donorId = <span class="str">'003xx000004TmiQAAS'</span>;
+    document.body.appendChild(el);
+
+    <span class="cmt">// 2. Wait for async rendering</span>
+    <span class="kw">return</span> Promise.<span class="fn">resolve</span>().<span class="fn">then</span>(() => {
+      <span class="cmt">// 3. Assert DOM state</span>
+      <span class="kw">const</span> name = el.shadowRoot.<span class="fn">querySelector</span>(<span class="str">'.donor-name'</span>);
+      expect(name).not.<span class="fn">toBeNull</span>();
+    });
+  });
+});
+<span class="file-label">donorSummary.test.js</span></code></pre>
+
+      <h2>Mocking @wire adapters</h2>
+      <p>Since Jest runs without a real Salesforce org, you mock wire adapters to simulate data and error states:</p>
+
+      <pre><code><span class="kw">import</span> { createElement } <span class="kw">from</span> <span class="str">'lwc'</span>;
+<span class="kw">import</span> { <span class="fn">registerLdsTestWireAdapter</span> } <span class="kw">from</span> <span class="str">'@salesforce/sfdx-lwc-jest'</span>;
+<span class="kw">import</span> { <span class="fn">getRecord</span> } <span class="kw">from</span> <span class="str">'lightning/uiRecordApi'</span>;
+<span class="kw">import</span> <span class="fn">DonorHeader</span> <span class="kw">from</span> <span class="str">'c/donorHeader'</span>;
+
+<span class="kw">const</span> getRecordAdapter = <span class="fn">registerLdsTestWireAdapter</span>(<span class="fn">getRecord</span>);
+
+<span class="kw">const</span> MOCK_CONTACT = {
+  fields: { FirstName: { value: <span class="str">'Amara'</span> }, LastName: { value: <span class="str">'Diallo'</span> } }
+};
+
+it(<span class="str">'displays donor full name from wire data'</span>, <span class="kw">async</span> () => {
+  <span class="kw">const</span> el = <span class="fn">createElement</span>(<span class="str">'c-donor-header'</span>, { is: <span class="fn">DonorHeader</span> });
+  document.body.appendChild(el);
+
+  <span class="cmt">// Push mock data into the wire adapter</span>
+  getRecordAdapter.<span class="fn">emit</span>(MOCK_CONTACT);
+
+  <span class="kw">await</span> Promise.<span class="fn">resolve</span>();
+
+  <span class="kw">const</span> heading = el.shadowRoot.<span class="fn">querySelector</span>(<span class="str">'h1'</span>);
+  expect(heading.textContent).<span class="fn">toBe</span>(<span class="str">'Amara Diallo'</span>);
+});
+<span class="file-label">donorHeader.test.js</span></code></pre>
+
+      <h2>Mocking Apex (Imperative)</h2>
+      <pre><code><span class="kw">import</span> <span class="fn">getGiftHistory</span> <span class="kw">from</span> <span class="str">'@salesforce/apex/DonorPortalController.getGiftHistory'</span>;
+
+<span class="cmt">// Jest auto-mocks Apex imports</span>
+jest.<span class="fn">mock</span>(<span class="str">'@salesforce/apex/DonorPortalController.getGiftHistory'</span>);
+
+it(<span class="str">'shows error state when Apex fails'</span>, <span class="kw">async</span> () => {
+  getGiftHistory.<span class="fn">mockRejectedValue</span>({ body: { message: <span class="str">'No access'</span> } });
+
+  <span class="kw">const</span> el = <span class="fn">createElement</span>(<span class="str">'c-gift-history'</span>, { is: <span class="fn">GiftHistory</span> });
+  document.body.appendChild(el);
+
+  <span class="kw">await</span> Promise.<span class="fn">resolve</span>();
+
+  <span class="kw">const</span> errMsg = el.shadowRoot.<span class="fn">querySelector</span>(<span class="str">'.error-message'</span>);
+  expect(errMsg.textContent).<span class="fn">toContain</span>(<span class="str">'No access'</span>);
+});
+<span class="file-label">giftHistory.test.js</span></code></pre>
+
+      <h2>Manual Testing Checklist</h2>
+      <p>For the Donor Portal, always test across these dimensions:</p>
+      <table>
+        <tr><th>Area</th><th>What to check</th></tr>
+        <tr><td>Auth states</td><td>Guest (not logged in), just-logged-in, session expired mid-flow</td></tr>
+        <tr><td>Data states</td><td>First-time donor (no gifts), donor with 1 gift, donor with 50+ gifts</td></tr>
+        <tr><td>Error states</td><td>Network failure, Apex exception, validation error, timeout</td></tr>
+        <tr><td>Localisation</td><td>EN, FR, NL — check labels, date/currency formatting, RTL if applicable</td></tr>
+        <tr><td>Tax receipts</td><td>CA (T4a), NL (ANBI), FR — each has different generation logic</td></tr>
+        <tr><td>Devices</td><td>Desktop, tablet, mobile (portal is responsive)</td></tr>
+      </table>
+
+      <div class="callout tip">
+        <div class="callout-title">Pro tip — Event testing</div>
+        <p>When a component fires a custom event, your test should assert that the event was dispatched with the right detail. Use <code>addEventListener</code> on the element before triggering the action.</p>
+      </div>
+
+      <pre><code>it(<span class="str">'fires receiptDownloaded event with correct id'</span>, <span class="kw">async</span> () => {
+  <span class="kw">const</span> handler = jest.<span class="fn">fn</span>();
+  el.<span class="fn">addEventListener</span>(<span class="str">'receiptdownloaded'</span>, handler);
+
+  el.shadowRoot.<span class="fn">querySelector</span>(<span class="str">'button'</span>).<span class="fn">click</span>();
+
+  <span class="kw">await</span> Promise.<span class="fn">resolve</span>();
+  expect(handler).<span class="fn">toHaveBeenCalledTimes</span>(<span class="val">1</span>);
+  expect(handler.mock.calls[<span class="val">0</span>][<span class="val">0</span>].detail.receiptId).<span class="fn">toBe</span>(<span class="str">'R-001'</span>);
+});
+<span class="file-label">receiptButton.test.js</span></code></pre>
+
+      <div class="quiz">
+        <div class="quiz-title">🧪 Quick Check</div>
+        <p>In a Jest test, a wired component renders nothing. You've created it and appended to the DOM. What's the most likely missing step?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" onclick="answer(this, false)">You forgot to import LightningElement</button>
+          <button class="quiz-opt" onclick="answer(this, true)">You haven't emitted data into the wire adapter mock</button>
+          <button class="quiz-opt" onclick="answer(this, false)">Jest doesn't support LWCs at all</button>
+          <button class="quiz-opt" onclick="answer(this, false)">You need to call connectedCallback() manually</button>
+        </div>
+        <div class="quiz-feedback" id="qf-current"></div>
+      </div>
+
+      <div class="module-nav">
+        <button class="btn btn-ghost" onclick="goTo(3)">← Module 3</button>
+        <button class="btn btn-primary" onclick="goTo(5)">Module 5: Portal Tour →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 5: PORTAL TOUR -->
+    <section class="module" id="module-5">
+      <div class="module-tag">Module 5</div>
+      <h1>Donor Portal Component Tour</h1>
+      <p class="intro">Now that you have the building blocks, here's how they map to the actual portal. This is your orientation guide.</p>
+
+      <h2>Key Component Areas</h2>
+
+      <h3>Authentication Flow</h3>
+      <div class="diagram">
+        <span class="d-accent">donorPortalLogin</span><br>
+        &nbsp;&nbsp;├── <span class="d-blue">donorEmailInput</span>&nbsp;&nbsp;&nbsp;&nbsp;← validates email format<br>
+        &nbsp;&nbsp;└── <span class="d-blue">donorOtpVerify</span>&nbsp;&nbsp;&nbsp;&nbsp;← OTP entry + resend logic<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── Apex: <span class="d-green">DonorAuthController</span>.verifyOtp()
+      </div>
+      <ul>
+        <li><strong>Test focus:</strong> Invalid email, expired OTP, too many attempts, resend cooldown</li>
+        <li><strong>Common issue:</strong> OTP expiry is controlled by a Custom Metadata value — check <code>OTP_Expiry_Minutes__mdt</code></li>
+      </ul>
+
+      <h3>Dashboard / Home</h3>
+      <div class="diagram">
+        <span class="d-accent">donorDashboard</span><br>
+        &nbsp;&nbsp;├── <span class="d-blue">donorSummaryCard</span>&nbsp;&nbsp;&nbsp;← @wire getRecord (Contact)<br>
+        &nbsp;&nbsp;├── <span class="d-blue">recurringGiftBanner</span>  ← Apex: getActiveRecurringGifts()<br>
+        &nbsp;&nbsp;└── <span class="d-blue">recentTransactions</span>&nbsp;← Apex: getRecentGifts(limit: 5)
+      </div>
+      <ul>
+        <li><strong>Test focus:</strong> Zero gifts state, paused recurring gift banner, currency formatting per locale</li>
+      </ul>
+
+      <h3>Gift History</h3>
+      <div class="diagram">
+        <span class="d-accent">giftHistoryPage</span><br>
+        &nbsp;&nbsp;├── <span class="d-blue">giftHistoryTable</span>&nbsp;&nbsp;&nbsp;← Apex: getGiftHistory(filters)<br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="d-blue">giftHistoryRow</span>&nbsp;&nbsp;← child, receives gift via @api<br>
+        &nbsp;&nbsp;└── <span class="d-blue">giftHistoryFilters</span> ← fires filterChanged event → parent re-fetches
+      </div>
+      <ul>
+        <li><strong>Test focus:</strong> Filter combinations, pagination, sort order, empty results</li>
+        <li><strong>Common issue:</strong> Filter state is local to <code>giftHistoryFilters</code> — uses custom events to bubble up to parent</li>
+      </ul>
+
+      <h3>Tax Receipts</h3>
+      <div class="diagram">
+        <span class="d-accent">taxReceiptPage</span><br>
+        &nbsp;&nbsp;├── <span class="d-blue">taxReceiptList</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← Apex: getTaxReceipts(year)<br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="d-blue">taxReceiptItem</span>&nbsp;&nbsp;← download button → Apex: generateReceiptPDF()<br>
+        &nbsp;&nbsp;└── <span class="d-blue">taxReceiptYearPicker</span>  ← fires yearSelected → re-fetches list
+      </div>
+      <ul>
+        <li><strong>Test focus:</strong> Different receipt templates by country (CA/NL/FR), download failure handling, year with no receipts</li>
+      </ul>
+
+      <h2>Debugging in the Portal</h2>
+      <table>
+        <tr><th>Symptom</th><th>First place to look</th></tr>
+        <tr><td>Component doesn't render</td><td>Browser console — LWC syntax errors surface here</td></tr>
+        <tr><td>Data doesn't load</td><td>Network tab → Salesforce API calls, then check Apex logs</td></tr>
+        <tr><td>Works for admin, not donor</td><td>Profile/permission set on Experience Cloud site</td></tr>
+        <tr><td>Wrong language shown</td><td>Custom Label translations in Setup, or user's locale setting</td></tr>
+        <tr><td>PDF doesn't generate</td><td>Apex logs → usually a template variable is null or unresolved</td></tr>
+      </table>
+
+      <div class="callout info">
+        <div class="callout-title">Apex Debug Logs</div>
+        <p>Go to <strong>Setup → Debug Logs</strong>, add a trace flag for the donor user, reproduce the issue, then check the log. Look for <code>USER_DEBUG</code> entries and any exceptions. The log level is usually set in the Custom Metadata.</p>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-title">VS Code tip</div>
+        <p>If you need to inspect component source, Tim can share VS Code with the project repo. The component files in <code>force-app/main/default/lwc/</code> map directly to what's deployed. Use <strong>Salesforce Inspector</strong> browser extension to see live field values on records.</p>
+      </div>
+
+      <div class="module-nav">
+        <button class="btn btn-ghost" onclick="goTo(4)">← Module 4</button>
+        <button class="btn btn-primary" onclick="goTo(6)">Cheat Sheet →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 6: CHEAT SHEET -->
+    <section class="module" id="module-6">
+      <div class="module-tag">Reference</div>
+      <h1>LWC Cheat Sheet</h1>
+      <p class="intro">Your quick-reference for the most common patterns you'll encounter in the Donor Portal codebase.</p>
+
+      <h2>Decorators</h2>
+      <pre><code><span class="dec">@api</span> donorId;           <span class="cmt">// public prop, parent sets this</span>
+<span class="dec">@track</span> gifts = [];      <span class="cmt">// deep reactive (objects/arrays)</span>
+<span class="dec">@wire</span>(<span class="fn">getRecord</span>, {...}) <span class="cmt">// reactive Salesforce data</span></code></pre>
+
+      <h2>Template directives</h2>
+      <pre><code><span class="cmt">&lt;!-- Conditional --&gt;</span>
+<span class="tag">&lt;template</span> <span class="attr">if:true</span>=<span class="str">{showBanner}</span><span class="tag">&gt;</span>...<span class="tag">&lt;/template&gt;</span>
+<span class="tag">&lt;template</span> <span class="attr">if:false</span>=<span class="str">{isLoading}</span><span class="tag">&gt;</span>...<span class="tag">&lt;/template&gt;</span>
+
+<span class="cmt">&lt;!-- Loop (key required!) --&gt;</span>
+<span class="tag">&lt;template</span> <span class="attr">for:each</span>=<span class="str">{gifts}</span> <span class="attr">for:item</span>=<span class="str">"gift"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">key</span>=<span class="str">{gift.Id}</span><span class="tag">&gt;</span>{gift.Name}<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span>
+
+<span class="cmt">&lt;!-- Iteration (index available) --&gt;</span>
+<span class="tag">&lt;template</span> <span class="attr">iterator:it</span>=<span class="str">{gifts}</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;div</span> <span class="attr">key</span>=<span class="str">{it.value.Id}</span><span class="tag">&gt;</span>#{it.index}: {it.value.Name}<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/template&gt;</span></code></pre>
+
+      <h2>Custom Events (child → parent)</h2>
+      <pre><code><span class="cmt">// Child fires event</span>
+<span class="kw">this</span>.<span class="fn">dispatchEvent</span>(<span class="kw">new</span> CustomEvent(<span class="str">'receiptdownloaded'</span>, {
+  detail: { receiptId: <span class="str">'R-001'</span> },
+  bubbles: <span class="kw">true</span>,      <span class="cmt">// crosses shadow DOM</span>
+  composed: <span class="kw">true</span>
+}));
+
+<span class="cmt">// Parent listens</span>
+<span class="tag">&lt;c-receipt-button</span> <span class="attr">onreceiptdownloaded</span>=<span class="str">{handleReceiptDone}</span><span class="tag">&gt;&lt;/c-receipt-button&gt;</span></code></pre>
+
+      <h2>Lifecycle quick map</h2>
+      <pre><code>constructor()         <span class="cmt">→ avoid, use connectedCallback</span>
+connectedCallback()   <span class="cmt">→ fetch data, setup (runs once)</span>
+renderedCallback()    <span class="cmt">→ after EVERY render, use sparingly</span>
+disconnectedCallback()<span class="cmt">→ cleanup timers/listeners</span></code></pre>
+
+      <h2>Common imports</h2>
+      <pre><code><span class="kw">import</span> { LightningElement, <span class="fn">wire</span>, <span class="fn">api</span>, <span class="fn">track</span> } <span class="kw">from</span> <span class="str">'lwc'</span>;
+<span class="kw">import</span> { <span class="fn">getRecord</span>, <span class="fn">updateRecord</span> } <span class="kw">from</span> <span class="str">'lightning/uiRecordApi'</span>;
+<span class="kw">import</span> { <span class="fn">NavigationMixin</span> } <span class="kw">from</span> <span class="str">'lightning/navigation'</span>;
+<span class="kw">import</span> { <span class="fn">CurrentPageReference</span> } <span class="kw">from</span> <span class="str">'lightning/navigation'</span>;
+<span class="kw">import</span> { <span class="fn">ShowToastEvent</span> } <span class="kw">from</span> <span class="str">'lightning/platformShowToastEvent'</span>;
+<span class="kw">import</span> LABEL <span class="kw">from</span> <span class="str">'@salesforce/label/c.Label_Name'</span>;
+<span class="kw">import</span> <span class="fn">myMethod</span> <span class="kw">from</span> <span class="str">'@salesforce/apex/ClassName.methodName'</span>;</code></pre>
+
+      <h2>Toast notification</h2>
+      <pre><code><span class="kw">this</span>.<span class="fn">dispatchEvent</span>(<span class="kw">new</span> <span class="fn">ShowToastEvent</span>({
+  title: <span class="str">'Receipt downloaded'</span>,
+  message: <span class="str">'Your tax receipt is ready.'</span>,
+  variant: <span class="str">'success'</span>  <span class="cmt">// success | error | warning | info</span>
+}));</code></pre>
+
+      <h2>Useful Salesforce Dev Links</h2>
+      <ul>
+        <li><a href="https://developer.salesforce.com/docs/component-library" target="_blank" style="color:var(--blue)">Component Reference</a> — every standard LWC component</li>
+        <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide" target="_blank" style="color:var(--blue)">LWC Developer Guide</a> — official docs</li>
+        <li><a href="https://trailhead.salesforce.com/content/learn/modules/lightning-web-components-basics" target="_blank" style="color:var(--blue)">Trailhead: LWC Basics</a> — free interactive course</li>
+      </ul>
+
+      <div style="margin-top: 3rem; text-align: center; padding: 2.5rem 2rem; border-top: 4px solid var(--wfp-blue); background: var(--wfp-navy); border-radius: 6px;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🎉</div>
+        <div style="font-family: 'Barlow', sans-serif; font-size: 1.6rem; font-weight: 900; margin-bottom: 0.5rem; color:#fff; text-transform:uppercase; letter-spacing:0.04em;">Course Complete!</div>
+        <p style="color: rgba(255,255,255,0.55); font-size: 0.9rem; max-width:400px; margin:0 auto;">You're ready to start exploring the Donor Portal codebase. Good luck — and ask Tim when things get weird. They will.</p>
+      </div>
+
+      <div class="module-nav">
+        <button class="btn btn-ghost" onclick="goTo(5)">← Portal Tour</button>
+        <button class="btn btn-primary" onclick="goTo(0)">Back to start</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const TOTAL = 7;
+  const visited = new Set([0]);
+
+  function goTo(n) {
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(ni => ni.classList.remove('active'));
+    
+    document.getElementById('module-' + n).classList.add('active');
+    document.querySelector('[data-module="' + n + '"]').classList.add('active');
+    
+    visited.add(n);
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress() {
+    document.querySelectorAll('.nav-item').forEach(ni => {
+      const idx = parseInt(ni.dataset.module);
+      if (visited.has(idx) && !ni.classList.contains('active')) {
+        ni.classList.add('done');
+      }
+    });
+    const pct = Math.round((visited.size / TOTAL) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+  }
+
+  function answer(btn, correct) {
+    const quiz = btn.closest('.quiz');
+    const opts = quiz.querySelectorAll('.quiz-opt');
+    const fb = quiz.querySelector('.quiz-feedback');
+    
+    opts.forEach(o => o.disabled = true);
+    
+    if (correct) {
+      btn.classList.add('correct');
+      fb.textContent = '✓ Correct! ' + getExplanation(quiz, true);
+      fb.className = 'quiz-feedback show ok';
+    } else {
+      btn.classList.add('wrong');
+      fb.textContent = '✗ Not quite. ' + getExplanation(quiz, false);
+      fb.className = 'quiz-feedback show nope';
+      // highlight correct
+      opts.forEach(o => {
+        if (o.onclick.toString().includes('true')) o.classList.add('correct');
+      });
+    }
+  }
+
+  function getExplanation(quiz, correct) {
+    const mod = quiz.closest('.module').id;
+    const explanations = {
+      'module-1': { ok: '@api makes a property public — parents can pass values in. @track and @wire serve different purposes.', nope: 'Only @api makes a property accessible from a parent component.' },
+      'module-2': { ok: 'Imperative calls give you full control over when the Apex method executes — perfect for user-triggered actions.', nope: '@wire is for declarative, reactive data — you can\'t use it for user-triggered mutations.' },
+      'module-3': { ok: 'Profile permissions, sharing rules, and FLS are the most common reason data loads for admins but not portal users.', nope: 'If the name loads (also from Salesforce), the wiring and JS are fine — it\'s an access issue.' },
+      'module-4': { ok: 'Wire adapters return undefined until you call .emit() with mock data. Always emit before asserting on wired components.', nope: 'Jest supports LWC via the @salesforce/sfdx-lwc-jest preset, and you don\'t call lifecycle hooks manually.' }
+    };
+    const e = explanations[mod];
+    return e ? (correct ? e.ok : e.nope) : '';
+  }
+</script>
+</body>
+</html>
