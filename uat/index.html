@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UAT Runner — WFP Supporter Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --wfp-blue: #0099D8;
+    --wfp-blue-dark: #007AB8;
+    --wfp-blue-deeper: #005A8E;
+    --wfp-navy: #1A2B4A;
+    --wfp-black: #1C1C1C;
+    --bg: #F4F6F8;
+    --surface: #FFFFFF;
+    --surface2: #EEF2F6;
+    --border: #D0DCE8;
+    --text: #1A2B4A;
+    --muted: #5A7490;
+    --code-bg: #1A2B4A;
+    --green: #2E9E5B;
+    --green-bg: #E8F5EE;
+    --red: #D63838;
+    --red-bg: #FEF0F0;
+    --amber: #E07B00;
+    --amber-bg: #FFF4E0;
+    --purple: #6B3FA0;
+    --purple-bg: #F3EEF9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 400;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .header {
+    border-bottom: 3px solid var(--wfp-blue);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,99,176,0.08);
+  }
+
+  .logo { display: flex; align-items: center; gap: 0.75rem; }
+
+  .logo-badge {
+    background: var(--wfp-blue);
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .logo-text {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--wfp-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .logo-text span { color: var(--wfp-blue); }
+
+  .header-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: var(--surface2);
+    color: var(--muted);
+  }
+  .stat-pill.pass { background: var(--green-bg); color: var(--green); }
+  .stat-pill.fail { background: var(--red-bg); color: var(--red); }
+  .stat-pill.skip { background: var(--amber-bg); color: var(--amber); }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .header-nav a {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .header-nav a:hover { color: var(--wfp-blue); border-color: var(--wfp-blue); background: #EBF7FD; }
+  .header-nav a.active { background: var(--wfp-blue); color: #fff; border-color: var(--wfp-blue); }
+
+  .progress-wrap { text-align: right; }
+  .progress-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.67rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    width: 180px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--wfp-blue);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    min-height: calc(100vh - 64px);
+  }
+
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    background: #fff;
+  }
+
+  .sidebar-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    padding: 0 1.25rem 0 1.75rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 0.75rem 0.5rem 1.25rem;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+    margin-bottom: 1px;
+    user-select: none;
+  }
+  .nav-item:hover { color: var(--wfp-blue); background: #EBF7FD; }
+  .nav-item.active { color: var(--wfp-blue); background: #EBF7FD; border-left-color: var(--wfp-blue); }
+  .nav-item.complete { color: var(--green); }
+
+  .nav-progress {
+    margin-left: auto;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    opacity: 0.7;
+  }
+  .nav-item.complete .nav-progress { color: var(--green); }
+
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.75rem 1.25rem;
+  }
+
+  .main {
+    padding: 2.5rem 3.5rem;
+    max-width: 960px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; animation: fadeUp 0.25s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--wfp-blue);
+    padding-bottom: 1rem;
+  }
+  .section-header h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--wfp-navy);
+    margin-bottom: 0.25rem;
+  }
+  .section-header p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .test-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .test-card:hover { box-shadow: 0 2px 12px rgba(0,99,176,0.07); }
+  .test-card.passed { border-left: 4px solid var(--green); }
+  .test-card.failed { border-left: 4px solid var(--red); }
+  .test-card.skipped { border-left: 4px solid var(--amber); }
+  .test-card.new-test { background: linear-gradient(135deg, #FFFDF5 0%, #FFFFFF 40%); }
+
+  .test-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .tc-id {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    background: var(--surface2);
+    color: var(--wfp-blue-deeper);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 52px;
+    text-align: center;
+  }
+
+  .tc-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .new-badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--amber-bg);
+    color: var(--amber);
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .amended-badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--purple-bg);
+    color: var(--purple);
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .tc-chevron {
+    color: var(--muted);
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+  }
+  .test-card.expanded .tc-chevron { transform: rotate(90deg); }
+
+  .test-body {
+    display: none;
+    padding: 0 1.25rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .test-card.expanded .test-body { display: block; }
+
+  .test-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .test-field label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .test-field .content {
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.6;
+    white-space: pre-line;
+  }
+
+  .test-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    align-items: center;
+  }
+
+  .btn {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 0.45rem 1rem;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .btn-pass {
+    background: var(--green-bg);
+    color: var(--green);
+    border-color: var(--green);
+  }
+  .btn-pass:hover, .btn-pass.active { background: var(--green); color: #fff; }
+
+  .btn-fail {
+    background: var(--red-bg);
+    color: var(--red);
+    border-color: var(--red);
+  }
+  .btn-fail:hover, .btn-fail.active { background: var(--red); color: #fff; }
+
+  .btn-skip {
+    background: var(--amber-bg);
+    color: var(--amber);
+    border-color: var(--amber);
+  }
+  .btn-skip:hover, .btn-skip.active { background: var(--amber); color: #fff; }
+
+  .btn-reset {
+    background: transparent;
+    color: var(--muted);
+    border-color: var(--border);
+    margin-left: auto;
+  }
+  .btn-reset:hover { background: var(--surface2); }
+
+  .notes-input {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.6rem;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 56px;
+    color: var(--text);
+    background: var(--surface);
+  }
+  .notes-input:focus { outline: none; border-color: var(--wfp-blue); box-shadow: 0 0 0 3px rgba(0,153,216,0.12); }
+
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    background: var(--border);
+  }
+  .test-card.passed .status-dot { background: var(--green); }
+  .test-card.failed .status-dot { background: var(--red); }
+  .test-card.skipped .status-dot { background: var(--amber); }
+
+  /* Summary dashboard at top */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .summary-card .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .summary-card .lbl {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-top: 0.35rem;
+    font-weight: 600;
+  }
+  .summary-card.s-total .val { color: var(--wfp-navy); }
+  .summary-card.s-pass .val { color: var(--green); }
+  .summary-card.s-fail .val { color: var(--red); }
+  .summary-card.s-skip .val { color: var(--amber); }
+  .summary-card.s-rate .val { color: var(--wfp-blue); }
+
+  /* Filter toolbar */
+  .filter-bar {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .filter-btn {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .filter-btn:hover { background: var(--surface2); }
+  .filter-btn.active { background: var(--wfp-blue); color: #fff; border-color: var(--wfp-blue); }
+  .filter-btn.active-new { background: var(--amber); color: #fff; border-color: var(--amber); }
+
+  /* Export bar */
+  .export-bar {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--border);
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  .btn-export {
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    padding: 0.55rem 1.25rem;
+    border-radius: 4px;
+    border: 2px solid var(--wfp-blue);
+    background: var(--wfp-blue);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .btn-export:hover { background: var(--wfp-blue-dark); }
+  .btn-export.secondary { background: transparent; color: var(--wfp-blue); }
+  .btn-export.secondary:hover { background: #EBF7FD; }
+
+  .priority-tag {
+    font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0.12rem 0.4rem; border-radius: 3px;
+  }
+  .priority-tag.critical { background: var(--red-bg); color: var(--red); }
+  .priority-tag.high { background: var(--amber-bg); color: var(--amber); }
+  .priority-tag.medium { background: var(--purple-bg); color: var(--purple); }
+  .priority-tag.low { background: var(--surface2); color: var(--muted); }
+
+  /* Responsive */
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 1.5rem; }
+    .summary-bar { grid-template-columns: repeat(3, 1fr); }
+    .test-grid { grid-template-columns: 1fr; }
+    .header-stats { display: none; }
+  }
+
+  .section-progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+  .section-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    background: var(--wfp-blue);
+  }
+
+  .amendment-source {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--amber);
+    font-weight: 600;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-badge">UAT<br>RUNNER</div>
+    <div class="logo-text">WFP <span>Supporter Portal</span></div>
+  </div>
+  <div class="header-nav">
+    <a href="/">Training Course</a>
+    <a href="/uat" class="active">UAT Runner</a>
+  </div>
+  <div class="header-stats" id="headerStats">
+    <div class="stat-pill pass" id="hPass">&#10003; 0</div>
+    <div class="stat-pill fail" id="hFail">&#10007; 0</div>
+    <div class="stat-pill skip" id="hSkip">&#8212; 0</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label" id="progressLabel">0 / 0 COMPLETE</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="mainContent"></main>
+</div>
+
+<script>
+// ============================================================
+// TEST DATA - All test cases from UAT Script v2.0
+// ============================================================
+const SECTIONS = [
+  {
+    id: "uat01", code: "UAT-01", title: "Design Kit & Branding",
+    desc: "Validate portal UI conformity to WFP Design Kit: color scheme, typography, spacing, responsive behaviour, and Round 2 amendments.",
+    tests: [
+      { tc: "01.01", name: "WFP color scheme applied", steps: "1. Open portal URL in Chrome\n2. Inspect header, footer, button elements\n3. Verify primary blue (#0A6EB4) and accent colors match WFP brand", expected: "All UI elements use WFP brand colors per the Design Kit" },
+      { tc: "01.02", name: "Typography matches WFP spec", steps: "1. Inspect heading fonts and body text\n2. Verify font family, sizes, and weights\n3. Check consistency across all pages", expected: "Typography matches WFP Design Kit specifications" },
+      { tc: "01.03", name: "WFP logo renders correctly", steps: "1. Navigate to portal\n2. Verify header logo at correct size\n3. Check footer branding", expected: "WFP logo displays correctly in header and footer" },
+      { tc: "01.04", name: "Reusable components styled consistently", steps: "1. Navigate through all portal pages\n2. Verify buttons, cards, input fields\n3. Confirm consistent styling", expected: "All reusable UI components render with consistent WFP styling" },
+      { tc: "01.05", name: "SLDS utility classes applied", steps: "1. Inspect page source\n2. Verify SLDS classes on layout components\n3. Check spacing and grid alignment", expected: "SLDS utility classes correctly applied; layout aligns to grid" },
+      { tc: "01.06", name: "Language selector in header/footer", steps: "1. Navigate to any portal page\n2. Locate language selector dropdown\n3. Verify it renders and is clickable", expected: "Language selector dropdown is visible and functional" },
+      { tc: "01.07", name: "Footer content complete", steps: "1. Scroll to footer\n2. Verify WFP branding, legal links, privacy policy\n3. Verify language selector in footer", expected: "Footer contains all required branding, links, and legal text" },
+      { tc: "01.08", name: "Font is Open Sans throughout", steps: "1. Inspect all headings and body text via DevTools\n2. Verify font-family is Open Sans\n3. Confirm no Apple System or fallback fonts rendered", expected: "All text renders in Open Sans font family", isNew: true, priority: "high" },
+      { tc: "01.09", name: "Footer logo is black (not greyed)", steps: "1. Scroll to footer\n2. Inspect WFP logo image\n3. Verify black version used", expected: "WFP footer logo renders in black", isNew: true, priority: "high" },
+      { tc: "01.10", name: "Border radius 5px on containers", steps: "1. Inspect container/card/section elements via DevTools\n2. Verify border-radius is 5px\n3. Check consistency with donation form", expected: "All containers use 5px border radius consistent with donation form", isNew: true, priority: "medium" },
+      { tc: "01.11", name: "'WFP Supporter Portal' terminology", steps: "1. Search all visible text for 'Donor Portal'\n2. Verify all references use 'WFP Supporter Portal'\n3. Check header, footer, emails", expected: "No 'Donor Portal' instances; 'WFP Supporter Portal' used throughout", isNew: true, priority: "critical" },
+      { tc: "01.12", name: "Need Help button colors match prototype", steps: "1. Locate Need Help section\n2. Inspect contact button colors\n3. Compare against AI prototype", expected: "Need Help buttons use correct colors from prototype", isNew: true, priority: "medium" },
+      { tc: "01.13", name: "Quick Actions menu font sizes", steps: "1. Navigate to home page\n2. Inspect Quick Actions text\n3. Verify increased font sizes per prototype", expected: "Quick Actions items use increased font sizes", isNew: true, priority: "medium" },
+      { tc: "01.14", name: "Back to top button", steps: "1. Scroll down any long page\n2. Verify button appears\n3. Click and verify scroll to top\n4. Check position relative to webchat", expected: "Back to top button appears, functions, and is correctly positioned", isNew: true, priority: "low" },
+      { tc: "01.15", name: "Footer links updated", steps: "1. Verify Privacy → donate.wfp.org/1279/p/privacy-policy/\n2. Verify T&C → donate.wfp.org/1322/p/terms-and-conditions/\n3. Verify FAQ → donate.wfp.org/2020/p/faq/\n4. Verify Contact Us REMOVED\n5. Verify TikTok icon → tiktok.com/@worldfoodprogramme", expected: "Footer has correct links. Contact Us removed. TikTok added.", isNew: true, priority: "high" },
+      { tc: "01.16", name: "Need Help – no Call Us", steps: "1. Locate Need Help section\n2. Verify Call Us is removed\n3. Verify remaining links work", expected: "Call Us removed. Live Chat, Email Us, WhatsApp functional.", isNew: true, priority: "high" },
+      { tc: "01.17", name: "URL paths match domain spec", steps: "1. Navigate all pages\n2. Verify account.donate.wfp.org/{page}\n3. Check: /your-impact, /donation-receipts, /contact-details, /login, /preferences, /404-not-found", expected: "All URL paths match specified domain structure", isNew: true, priority: "critical" },
+    ]
+  },
+  {
+    id: "uat02", code: "UAT-02", title: "Authentication System",
+    desc: "Validate email-based OTP flow, tiered authentication levels (Level 1 / Level 3), session management, and security controls.",
+    tests: [
+      { tc: "02.01", name: "Landing page renders with email input", steps: "1. Navigate to portal URL\n2. Verify landing page loads\n3. Confirm email input field", expected: "Landing page loads with email input and submit button" },
+      { tc: "02.02", name: "Valid email triggers OTP", steps: "1. Enter Donor A's email\n2. Click submit\n3. Check inbox within 30s", expected: "OTP arrives within 30s with 6-digit code and WFP branding" },
+      { tc: "02.03", name: "Invalid email shows error", steps: "1. Enter unlinked email\n2. Click submit\n3. Observe error", expected: "User-friendly error; no OTP sent" },
+      { tc: "02.04", name: "Correct OTP authenticates", steps: "1. Complete 02.02\n2. Enter correct OTP\n3. Submit", expected: "Session created; redirected to home page" },
+      { tc: "02.05", name: "Incorrect OTP – attempt count", steps: "1. Complete 02.02\n2. Enter wrong OTP\n3. Observe error", expected: "Error shows remaining attempts" },
+      { tc: "02.06", name: "3 failed OTPs trigger lockout", steps: "1. Complete 02.02\n2. Enter wrong OTP 3 times", expected: "Account locked; appropriate message" },
+      { tc: "02.07", name: "OTP expires after 10 min", steps: "1. Complete 02.02\n2. Wait 10+ min\n3. Enter expired OTP", expected: "OTP rejected; prompted to request new code" },
+      { tc: "02.08", name: "Session expires after timeout", steps: "1. Authenticate\n2. Wait 30 min\n3. Attempt navigation", expected: "Redirected to login with session expired message" },
+      { tc: "02.09", name: "Hashed Contact ID in URL", steps: "1. Authenticate\n2. Inspect URL bar\n3. Verify Contact ID is hashed", expected: "URL contains hashed ID; plaintext not visible" },
+      { tc: "02.10", name: "Logout clears session", steps: "1. Authenticate and navigate\n2. Click logout\n3. Try back button", expected: "Session cleared; back button doesn't restore" },
+      { tc: "02.11", name: "Login confirmation email", steps: "1. Authenticate as Donor A\n2. Check inbox", expected: "Confirmation email with timestamp and IP" },
+      { tc: "02.12", name: "Level 1 Auth – Preferences (no OTP)", steps: "1. Click preferences link from email\n2. Verify page loads without OTP\n3. Click other menu items → disclaimer popup\n4. Verify Logout hidden", expected: "Preferences accessible without OTP. Menu restricted. Logout hidden.", isNew: true, priority: "critical" },
+      { tc: "02.13", name: "Level 1 Auth – Donation Receipts (no OTP)", steps: "1. Click receipts link from email\n2. Verify no OTP required\n3. Menu items → disclaimer popup\n4. Logout hidden", expected: "Receipts accessible without OTP. Menu restricted. Logout hidden.", isNew: true, priority: "critical" },
+      { tc: "02.14", name: "Level 1 Auth – Your Impact (no OTP)", steps: "1. Click upgrade link from email\n2. Verify no OTP\n3. Menu restricted with disclaimer\n4. Logout hidden", expected: "Impact page accessible without OTP. Menu restricted.", isNew: true, priority: "critical" },
+      { tc: "02.15", name: "Level 3 Auth – Contact Details (OTP on edit)", steps: "1. Navigate to Contact Details (Level 3)\n2. Verify OTP on entry\n3. View hashed data\n4. Edit → Save → second OTP triggered", expected: "Dual OTP: on entry and on save. Hashed view state.", isNew: true, priority: "critical" },
+      { tc: "02.16", name: "Level 1 session – one hour validity", steps: "1. Enter via Level 1 link\n2. Navigate freely for 1 hour\n3. Verify session expires after", expected: "Level 1 session lasts 1 hour within single page", isNew: true, priority: "high" },
+      { tc: "02.17", name: "Unregistered email – no OTP sent", steps: "1. Enter unregistered email\n2. Submit\n3. Check error appears\n4. Verify NO OTP email", expected: "Error shown. No OTP sent for unregistered emails.", isNew: true, priority: "high" },
+    ]
+  },
+  {
+    id: "uat03", code: "UAT-03", title: "Home Page & Dashboard",
+    desc: "Validate donor dashboard, giving summary, quick actions, FAQ, Help Center, and Round 2 updates.",
+    tests: [
+      { tc: "03.01", name: "Home page loads within 3s", steps: "1. Authenticate as Donor A\n2. Measure load time\n3. Use DevTools", expected: "Page fully renders within 3 seconds" },
+      { tc: "03.02", name: "Active Monthly Donations display", steps: "1. Authenticate as Donor A\n2. Review Active Monthly Donations card", expected: "All active Gift Commitments with amount, frequency, next date" },
+      { tc: "03.03", name: "Gift Commitment card details", steps: "1. Locate Current Gift Commitment\n2. Verify details", expected: "Amount, frequency, status displayed correctly" },
+      { tc: "03.04", name: "Last Donation Date accurate", steps: "1. Locate Last Donation Date\n2. Cross-reference Salesforce", expected: "Date matches Salesforce data" },
+      { tc: "03.05", name: "Last One-Time Donation", steps: "1. Authenticate as Donor A (with one-time history)\n2. Locate card", expected: "Most recent one-time transaction displayed" },
+      { tc: "03.06", name: "Donor with no recurring gifts", steps: "1. Authenticate as Donor C\n2. Review Active Monthly section", expected: "Empty state message; no errors" },
+      { tc: "03.07", name: "Quick Action: Increase Impact", steps: "1. Click 'Increase My Impact'\n2. Verify navigation", expected: "Navigated to Increase Impact page" },
+      { tc: "03.08", name: "Quick Action: Contact Details", steps: "1. Click 'Update Contact Details'\n2. Verify navigation", expected: "Navigated to Contact Details page" },
+      { tc: "03.09", name: "Quick Action: Preferences", steps: "1. Click 'Manage Preferences'\n2. Verify navigation", expected: "Navigated to Preferences page" },
+      { tc: "03.10", name: "Quick Action: View Receipts", steps: "1. Click 'View Receipts'\n2. Verify navigation", expected: "Navigated to Donation Receipts page" },
+      { tc: "03.11", name: "FAQ accordion", steps: "1. Locate FAQ section\n2. Click to expand\n3. Click to collapse", expected: "FAQ items expand/collapse correctly" },
+      { tc: "03.12", name: "Help Center section", steps: "1. Locate Help Center\n2. Verify contact info and link", expected: "Displays support info and external link" },
+      { tc: "03.13", name: "New donor – no history", steps: "1. Authenticate as Donor D\n2. Review all cards", expected: "Empty states; no errors; quick actions available" },
+      { tc: "03.14", name: "New RG donation disclaimer", steps: "1. Authenticate as donor with recent new RG\n2. Check homepage disclaimer", expected: "Disclaimer advises checking new RG within couple of hours", isNew: true, priority: "high" },
+      { tc: "03.15", name: "Donation status labels", steps: "1. View donations with various statuses\n2. Verify labels", expected: "'Completed' for success, 'Canceled' for canceled/refunded", isNew: true, priority: "low" },
+      { tc: "03.16", name: "Column alignment – RG vs outdated", steps: "1. View both active and outdated sections\n2. Check column alignment", expected: "Columns aligned consistently between sections", isNew: true, priority: "medium" },
+    ]
+  },
+  {
+    id: "uat04", code: "UAT-04", title: "Increase Impact (Your Impact)",
+    desc: "Validate donation increase, amount suggestions, impact messaging, upgrade controls, and Round 2 validation rules.",
+    tests: [
+      { tc: "04.01", name: "Suggested amounts display", steps: "1. Authenticate\n2. Navigate to Increase Impact\n3. Review amounts", expected: "Three suggestions: current, -20%, +20%" },
+      { tc: "04.02", name: "Select suggested amount", steps: "1. Click +20%\n2. Verify highlight\n3. Review impact message", expected: "Selected highlighted; impact message updates" },
+      { tc: "04.03", name: "Custom amount entry", steps: "1. Select custom option\n2. Enter valid amount\n3. Verify impact update", expected: "Custom accepted; impact message reflects amount" },
+      { tc: "04.04", name: "Gift Commitment updated", steps: "1. Select and confirm\n2. Check confirmation\n3. Verify in Salesforce", expected: "Confirmation shown; SF record updated" },
+      { tc: "04.05", name: "Minimum threshold validation", steps: "1. Enter below minimum\n2. Attempt submit", expected: "Validation prevents submission" },
+      { tc: "04.06", name: "Impact message in language", steps: "1. Switch to French\n2. Navigate to Impact\n3. Check message", expected: "Impact messages in French" },
+      { tc: "04.07", name: "Error handling – failed update", steps: "1. Simulate failure\n2. Observe error handling", expected: "Friendly error; no data corruption" },
+      { tc: "04.08", name: "Session values pass correctly", steps: "1. Navigate from home\n2. Verify pre-populated values", expected: "Current amounts pre-populated" },
+      { tc: "04.09", name: "Max cap USD 1000 validation", steps: "1. Enter amount > USD 1000\n2. Attempt submit\n3. Verify inline validation", expected: "Inline validation prevents amount above $1000", isNew: true, priority: "medium" },
+      { tc: "04.10", name: "No minimum amount cap", steps: "1. Enter amount slightly above current\n2. Submit\n3. Verify acceptance", expected: "Accepted – must be more than current only, no min cap", isNew: true, priority: "medium" },
+      { tc: "04.11", name: "Double confirmation on upgrade", steps: "1. Select upgrade amount\n2. Click confirm\n3. Verify second prompt\n4. Confirm again", expected: "Double confirmation before processing", isNew: true, priority: "medium" },
+      { tc: "04.12", name: "Downgrade → Supporter Care", steps: "1. Enter amount lower than current\n2. Verify popup/message", expected: "Message directs to Supporter Care for downgrades", isNew: true, priority: "medium" },
+      { tc: "04.13", name: "Banner admin-controllable", steps: "1. Toggle banner visibility as admin\n2. Verify show/hide\n3. Check single-RG logic", expected: "Banner controlled by admin; shown only for single-RG supporters", isNew: true, priority: "low" },
+      { tc: "04.14", name: "Dynamic campaign in upgrade text", steps: "1. View upgrade for donor with known campaign\n2. Verify campaign name appears in text", expected: "Text includes most recent RG campaign name", isNew: true, priority: "low" },
+      { tc: "04.15", name: "Upgraded price reflected", steps: "1. Complete upgrade\n2. Return to home\n3. Verify new amount", expected: "New price reflected on home page and Salesforce", isNew: true, priority: "high" },
+    ]
+  },
+  {
+    id: "uat05", code: "UAT-05", title: "Contact Details",
+    desc: "Validate contact view, inline validation, phone prefix, language preferences, mailing address logic, and Level 3 auth.",
+    tests: [
+      { tc: "05.01", name: "Contact details display", steps: "1. Authenticate\n2. Navigate to Contact Details\n3. Verify fields", expected: "Name, Email, Address displayed (read-only, hashed)" },
+      { tc: "05.02", name: "Only phone editable", steps: "1. Try editing First Name, Email\n2. Verify Phone editable", expected: "All read-only except Phone" },
+      { tc: "05.03", name: "Phone validation – valid", steps: "1. Enter valid phone\n2. Save", expected: "Accepted; confirmation displayed" },
+      { tc: "05.04", name: "Phone validation – invalid", steps: "1. Enter invalid phone\n2. Save", expected: "Validation error; not updated" },
+      { tc: "05.05", name: "Contact record updated in SF", steps: "1. Update phone\n2. Check Salesforce", expected: "Contact.Phone updated" },
+      { tc: "05.06", name: "Confirmation & email notification", steps: "1. Update phone\n2. Check screen\n3. Check inbox", expected: "On-screen confirmation; email sent" },
+      { tc: "05.07", name: "Edit state – different background", steps: "1. Click Edit\n2. Verify background color changes\n3. Compare with view state", expected: "Edit state has visually distinct background", isNew: true, priority: "high" },
+      { tc: "05.08", name: "Inline validation – blank field", steps: "1. Clear mandatory field\n2. Tab away\n3. Verify message type 1", expected: "Specific inline message for blank/required fields", isNew: true, priority: "high" },
+      { tc: "05.09", name: "Inline validation – wrong format", steps: "1. Enter invalid email format\n2. Tab away\n3. Verify message type 2", expected: "Different inline style for incorrect format", isNew: true, priority: "high" },
+      { tc: "05.10", name: "Phone prefix – 240+ countries", steps: "1. Open phone prefix dropdown\n2. Verify 240+ countries\n3. Verify alphabetical by full name, not ISO", expected: "240+ countries alphabetical by full name", isNew: true, priority: "high" },
+      { tc: "05.11", name: "Language preferences dropdown", steps: "1. Locate language selector\n2. Verify: EN, FR, AR, DE, CN, ES\n3. Change and save\n4. Check global dropdown reflects change", expected: "6 language options. Selection reflected globally.", isNew: true, priority: "high" },
+      { tc: "05.12", name: "Mailing address – tax countries only", steps: "1. Set country to CA (tax)\n2. Verify mandatory address\n3. Set non-tax country\n4. Verify optional", expected: "Mandatory for CA, FR, DE, NL, AU. Optional otherwise.", isNew: true, priority: "critical" },
+      { tc: "05.13", name: "Country selector expands fields", steps: "1. Select tax country\n2. Verify address fields expand\n3. Select non-tax\n4. Verify collapse", expected: "Dynamic show/hide based on tax eligibility", isNew: true, priority: "critical" },
+      { tc: "05.14", name: "Unsaved changes – toast & block", steps: "1. Make change, don't save\n2. Click sidebar menu\n3. Verify toast\n4. Verify navigation blocked", expected: "Toast reminder. Navigation blocked until saved.", isNew: true, priority: "high" },
+    ]
+  },
+  {
+    id: "uat06", code: "UAT-06", title: "Preferences Management",
+    desc: "Validate communication preferences, consent toggles, language, data privacy, and unsaved changes warning.",
+    tests: [
+      { tc: "06.01", name: "Current consent statuses", steps: "1. Authenticate\n2. Navigate to Preferences\n3. Verify toggles", expected: "All channel toggles show current status" },
+      { tc: "06.02", name: "Toggle – opt in", steps: "1. Toggle opted-out → opted-in\n2. Save", expected: "Toggle updated; SF Contact Point Consent updated" },
+      { tc: "06.03", name: "Toggle – opt out", steps: "1. Toggle opted-in → opted-out\n2. Save", expected: "Toggle updated; SF record updated" },
+      { tc: "06.04", name: "Language preference selector", steps: "1. Change English → French\n2. Save", expected: "Saved; Preferred_Language__c updated in SF" },
+      { tc: "06.05", name: "Privacy policy link", steps: "1. Locate Data Privacy section\n2. Click link", expected: "Privacy policy opens" },
+      { tc: "06.06", name: "Data export request", steps: "1. Click request data export\n2. Confirm", expected: "Confirmation; workflow triggered" },
+      { tc: "06.07", name: "Account deletion request", steps: "1. Click request deletion\n2. Confirm", expected: "Confirmation; case created" },
+      { tc: "06.08", name: "Save confirmation message", steps: "1. Make change\n2. Save", expected: "Success message displayed" },
+      { tc: "06.09", name: "Labels in selected language", steps: "1. Switch to French\n2. Navigate to Preferences", expected: "All labels in French" },
+      { tc: "06.10", name: "Unsaved changes – toast & block", steps: "1. Toggle a preference\n2. Don't save\n3. Click sidebar menu\n4. Verify toast and block", expected: "Toast reminder. Navigation blocked until saved.", isNew: true, priority: "high" },
+    ]
+  },
+  {
+    id: "uat07", code: "UAT-07", title: "Donation Receipts",
+    desc: "Validate receipt listing, PDF generation (CA/NL/FR), country disclaimers (DE/AU/ROW), language logic, and receipt icons.",
+    tests: [
+      { tc: "07.01", name: "Receipt list by year", steps: "1. Authenticate as Donor A (CA)\n2. Navigate to Donation Receipts\n3. Select year", expected: "Eligible transactions for selected year" },
+      { tc: "07.02", name: "Eligible years populated", steps: "1. Check year selector", expected: "Only years with eligible transactions appear" },
+      { tc: "07.03", name: "CA tax receipt PDF", steps: "1. As CA donor, generate receipt\n2. Open PDF", expected: "CRA-compliant: BN, name, address, date, amount, receipt #" },
+      { tc: "07.04", name: "NL tax receipt PDF", steps: "1. As NL donor, generate\n2. Verify", expected: "ANBI-compliant: RSIN, donor details, purpose" },
+      { tc: "07.05", name: "FR tax receipt PDF", steps: "1. As FR donor, generate\n2. Verify", expected: "CERFA-format: association, donor, payment, amount" },
+      { tc: "07.06", name: "PDF includes WFP branding", steps: "1. Open any receipt\n2. Verify logo and details", expected: "WFP logo and registration details present" },
+      { tc: "07.07", name: "Unique receipt numbers", steps: "1. Generate multiple\n2. Verify uniqueness", expected: "Each receipt has unique number" },
+      { tc: "07.08", name: "Single vs recurring separated", steps: "1. View receipts\n2. Verify distinction", expected: "Categorized/filterable by type" },
+      { tc: "07.09", name: "Download – all browsers", steps: "1. Download in Chrome, Safari, Firefox, Edge", expected: "PDF downloads in all browsers" },
+      { tc: "07.10", name: "Email receipt delivery", steps: "1. Click email option\n2. Check inbox", expected: "Email with PDF attachment received" },
+      { tc: "07.11", name: "Menu title is 'Donation Receipts'", steps: "1. Check sidebar menu\n2. Check page heading\n3. No 'Tax Receipts'", expected: "Title reads 'Donation Receipts' everywhere", isNew: true, priority: "critical" },
+      { tc: "07.12", name: "DE & AU – disclaimer only", steps: "1. As DE/AU supporter\n2. Navigate to Receipts\n3. Verify sections hidden\n4. Disclaimer bar shown", expected: "Sections hidden; country-specific disclaimer displayed", isNew: true, priority: "critical" },
+      { tc: "07.13", name: "ROW – disclaimer + email prompt", steps: "1. As ROW supporter (non CA/NL/FR/DE/AU)\n2. Navigate to Receipts\n3. Verify disclaimer + email prompt\n4. No yellow info boxes", expected: "Disclaimer only. Email prompt to Supporter Care. No yellow boxes.", isNew: true, priority: "critical" },
+      { tc: "07.14", name: "Monthly receipt icons correct", steps: "1. View monthly donation receipts\n2. Check icons per prototype", expected: "Monthly donation icons render correctly", isNew: true, priority: "high" },
+      { tc: "07.15", name: "Annual receipt – no Monthly badge", steps: "1. View annual receipt\n2. Verify no 'Monthly Donation' badge", expected: "No Monthly badge on Annual Receipt", isNew: true, priority: "high" },
+      { tc: "07.16", name: "Incomplete status – missing address", steps: "1. As tax-country donor with missing address\n2. View receipts\n3. Check incomplete widget", expected: "Incomplete widget prompts address completion", isNew: true, priority: "medium" },
+      { tc: "07.17", name: "Receipt language logic", steps: "1. FR donor with German pref → receipt in FR\n2. CA donor with EN pref → receipt in EN\n3. Change preference, verify change", expected: "EN/FR only. Language by pref or country default.", isNew: true, priority: "high" },
+      { tc: "07.18", name: "Annual receipt disclaimer", steps: "1. View when annual receipt emitted\n2. Verify disclaimer text", expected: "Disclaimer displayed for annual receipt emission", isNew: true, priority: "low" },
+      { tc: "07.19", name: "Multi-country donor mixed view", steps: "1. Donor with multi-country donations\n2. View receipts\n3. Verify mix of downloads and disclaimers", expected: "Combination of receipt downloads and disclaimers per country", isNew: true, priority: "medium" },
+    ]
+  },
+  {
+    id: "uat08", code: "UAT-08", title: "Translation & Multilingual",
+    desc: "Validate multilingual support, translation accuracy, language switching, and expanded 5-language requirements.",
+    tests: [
+      { tc: "08.01", name: "Language selector changes all labels", steps: "1. Authenticate in English\n2. Switch to French\n3. Navigate all pages", expected: "All labels, headings, content switch to French" },
+      { tc: "08.02", name: "Language preference persists", steps: "1. Switch to Dutch\n2. Navigate between pages\n3. Log out and back in", expected: "Persists across navigation and sessions" },
+      { tc: "08.03", name: "Fallback to English", steps: "1. Switch to incomplete language\n2. Navigate to page with missing keys", expected: "Falls back to English; no broken keys" },
+      { tc: "08.04", name: "FAQ content in language", steps: "1. Switch language\n2. View FAQ\n3. Expand items", expected: "FAQ in selected language" },
+      { tc: "08.05", name: "Validation errors translated", steps: "1. Switch to French\n2. Trigger validation error", expected: "Error message in French" },
+      { tc: "08.06", name: "Email templates respect language", steps: "1. Set French\n2. Trigger email (OTP, confirmation)\n3. Check content", expected: "Email in French" },
+      { tc: "08.07", name: "All text translatable to 5 languages", steps: "1. Switch to each: EN, FR, DE, AR, CN\n2. Navigate all pages\n3. Verify all text translated", expected: "All portal text translatable to EN, FR, DE, AR, CN", isNew: true, priority: "critical" },
+      { tc: "08.08", name: "OTP dialogs translated", steps: "1. Switch to French\n2. Trigger OTP flow\n3. Verify dialog text", expected: "OTP dialogs fully translated", isNew: true, priority: "critical" },
+      { tc: "08.09", name: "Popup/layover messages translated", steps: "1. Switch to German\n2. Trigger popup (unsaved changes, Level 1 disclaimer)\n3. Verify text", expected: "All popups and toasts translated", isNew: true, priority: "high" },
+      { tc: "08.10", name: "Country names & phone codes translated", steps: "1. Switch to Arabic\n2. Open phone prefix dropdown\n3. Verify country names in Arabic", expected: "Country names translated; phone codes correct", isNew: true, priority: "high" },
+    ]
+  },
+  {
+    id: "uat09", code: "UAT-09", title: "Cross-Browser & Responsive",
+    desc: "Validate rendering and functionality across browsers and viewports. Round 2: mobile back button.",
+    tests: [
+      { tc: "09.01", name: "Chrome desktop", steps: "1. Chrome (latest) at 1024px+\n2. Full auth + navigation", expected: "All pages correct; no layout issues" },
+      { tc: "09.02", name: "Safari desktop", steps: "1. Safari (latest) at 1024px+\n2. Full flow", expected: "All pages correct" },
+      { tc: "09.03", name: "Firefox desktop", steps: "1. Firefox (latest) at 1024px+\n2. Full flow", expected: "All pages correct" },
+      { tc: "09.04", name: "Edge desktop", steps: "1. Edge (latest) at 1024px+\n2. Full flow", expected: "All pages correct" },
+      { tc: "09.05", name: "Mobile 320px", steps: "1. Set 320px width\n2. Navigate all pages", expected: "Responsive; no horizontal scroll" },
+      { tc: "09.06", name: "Tablet 768px", steps: "1. Set 768px width\n2. Navigate all pages", expected: "Tablet layout adapts; reflow correct" },
+      { tc: "09.07", name: "iOS Safari mobile", steps: "1. Open on iPhone Safari\n2. Full flow", expected: "All features functional" },
+      { tc: "09.08", name: "Android Chrome mobile", steps: "1. Open on Android Chrome\n2. Full flow", expected: "All features functional" },
+      { tc: "09.09", name: "Mobile back button functional", steps: "1. On mobile, navigate pages\n2. Tap back button\n3. Verify correct navigation", expected: "Back button works correctly on mobile", isNew: true, priority: "high" },
+    ]
+  },
+  {
+    id: "uat10", code: "UAT-10", title: "Security & Session",
+    desc: "Validate security controls, session handling, URL integrity, and Apex protections.",
+    tests: [
+      { tc: "10.01", name: "Hashed ID cannot be decoded", steps: "1. Copy hashed ID from URL\n2. Attempt decode\n3. Verify irreversible without salt", expected: "Cannot reverse-engineer without org salt" },
+      { tc: "10.02", name: "Direct URL without session", steps: "1. Copy portal URL\n2. Open incognito", expected: "Redirected to login; no content" },
+      { tc: "10.03", name: "Tampered session rejected", steps: "1. Authenticate\n2. Modify token\n3. Try navigation", expected: "Invalid session; redirected to login" },
+      { tc: "10.04", name: "CRUD/FLS enforcement", steps: "1. Review Apex controllers\n2. Verify 'with sharing'\n3. Verify CRUD/FLS", expected: "All enforce sharing and FLS" },
+      { tc: "10.05", name: "No SOQL injection", steps: "1. Enter injection patterns in all fields\n2. Observe", expected: "All inputs sanitized; graceful errors" },
+      { tc: "10.06", name: "Concurrent sessions", steps: "1. Auth in Browser 1\n2. Auth in Browser 2\n3. Verify behavior", expected: "Follows defined business rules" },
+    ]
+  },
+  {
+    id: "uat11", code: "UAT-11", title: "End-to-End Workflows",
+    desc: "Complete donor journeys validating integration of all components including tiered auth and country-specific flows.",
+    tests: [
+      { tc: "11.01", name: "E2E: CA donor full journey", steps: "1. Portal as Donor A (CA)\n2. OTP auth\n3. Review dashboard\n4. Increase gift\n5. Update phone\n6. Change consent\n7. Download CA receipt\n8. Switch to French\n9. Logout", expected: "All steps complete; data persists in SF" },
+      { tc: "11.02", name: "E2E: NL donor receipt flow", steps: "1. Donor B (NL)\n2. OTP auth\n3. Donation Receipts\n4. Download NL receipt\n5. Email receipt\n6. Verify email", expected: "ANBI receipt delivered correctly" },
+      { tc: "11.03", name: "E2E: FR donor with language", steps: "1. Donor C (FR)\n2. Set French\n3. Navigate all pages\n4. CERFA receipt\n5. Verify French content", expected: "All content in French; CERFA correct" },
+      { tc: "11.04", name: "E2E: New donor no history", steps: "1. Donor D\n2. Auth\n3. Empty states\n4. Update phone\n5. Set preferences\n6. Logout", expected: "Empty states; preferences saved; no errors" },
+      { tc: "11.05", name: "E2E: Session expiry mid-workflow", steps: "1. Auth\n2. Begin Impact flow\n3. Wait for expiry\n4. Try submit", expected: "Expiry detected; redirected; no corruption" },
+      { tc: "11.06", name: "E2E: Level 1 Preferences from email", steps: "1. Click prefs link (no OTP)\n2. Modify preferences\n3. Save\n4. Click menu → disclaimer\n5. Verify Logout hidden", expected: "Level 1 prefs flow works. Menu restricted.", isNew: true, priority: "critical" },
+      { tc: "11.07", name: "E2E: Level 1 Upgrade from email", steps: "1. Click upgrade link (no OTP)\n2. View amount\n3. Select upgrade\n4. Double confirm\n5. Verify SF updated", expected: "Level 1 upgrade end-to-end. Double confirm.", isNew: true, priority: "critical" },
+      { tc: "11.08", name: "E2E: DE/AU donor disclaimer", steps: "1. Auth as DE/AU donor\n2. Donation Receipts\n3. Verify disclaimer\n4. No downloads\n5. Navigate portal", expected: "Disclaimer shown. Portal otherwise works.", isNew: true, priority: "critical" },
+      { tc: "11.09", name: "E2E: ROW donor no receipts", steps: "1. Auth as ROW donor\n2. Donation Receipts\n3. Disclaimer + email prompt\n4. Navigate portal", expected: "Disclaimer with email prompt. Portal functional.", isNew: true, priority: "critical" },
+      { tc: "11.10", name: "E2E: Contact Details Level 3", steps: "1. Contact Details from email\n2. OTP auth\n3. View hashed data\n4. Edit\n5. Save → second OTP\n6. Verify SF update", expected: "Dual OTP flow, hashed view, save, SF update.", isNew: true, priority: "critical" },
+    ]
+  },
+  {
+    id: "uat12", code: "UAT-12", title: "Platform & Integration",
+    desc: "NEW SECTION: Webchat, analytics, 404 page, admin controls, and reporting integrations from Round 2.",
+    tests: [
+      { tc: "12.01", name: "Service Cloud Webchat embedded", steps: "1. Navigate any page\n2. Verify webchat widget\n3. Open webchat\n4. Verify NO chatbot/Einstein\n5. Verify live agent", expected: "Webchat visible. No chatbot. Live agent works.", isNew: true, priority: "critical" },
+      { tc: "12.02", name: "Report a Problem – email link", steps: "1. Find 'Report a Problem'\n2. Click\n3. Verify mailto: supportercare@wfp.org\n4. Verify subject pre-populated", expected: "Opens email to supportercare@wfp.org with subject", isNew: true, priority: "medium" },
+      { tc: "12.03", name: "Email Us footer link", steps: "1. Find 'Email Us' in Need Help\n2. Click\n3. Verify email client with pre-populated subject", expected: "Opens email with pre-populated subject", isNew: true, priority: "medium" },
+      { tc: "12.04", name: "WhatsApp Us footer link", steps: "1. Find 'WhatsApp Us'\n2. Click\n3. Verify correct number", expected: "Opens correct WhatsApp conversation", isNew: true, priority: "medium" },
+      { tc: "12.05", name: "404 Not Found page", steps: "1. Navigate to random URL path\n2. Verify 404 renders\n3. Verify WFP branding\n4. Navigate back to portal", expected: "Custom 404 with WFP branding and navigation", isNew: true, priority: "low" },
+      { tc: "12.06", name: "FAQ admin visibility control", steps: "1. As admin, toggle FAQ visibility\n2. Verify show/hide on portal", expected: "FAQ section controllable by admin", isNew: true, priority: "medium" },
+      { tc: "12.07", name: "URL param pre-population", steps: "1. Construct URL with upgrade value param\n2. Navigate to Impact\n3. Verify pre-selected amount", expected: "Upgrade values pre-populated from URL params", isNew: true, priority: "high" },
+      { tc: "12.08", name: "Tableau data warehouse", steps: "1. Verify reporting data flows to Tableau\n2. Check data integrity\n3. Verify key metrics", expected: "Data flows correctly to Tableau", isNew: true, priority: "critical" },
+      { tc: "12.09", name: "GA data layers", steps: "1. Open with GA debug extension\n2. Navigate key actions\n3. Verify data layer events\n4. Check enhanced ecommerce", expected: "Data layers at key points for GA tracking", isNew: true, priority: "high" },
+    ]
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {};
+let activeSection = SECTIONS[0].id;
+let activeFilter = 'all';
+
+function initState() {
+  SECTIONS.forEach(s => {
+    s.tests.forEach(t => {
+      const key = s.id + '_' + t.tc;
+      if (!state[key]) state[key] = { status: '', notes: '' };
+    });
+  });
+}
+
+function saveState() {
+  try { localStorage.setItem('wfp_uat', JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('wfp_uat');
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function getStats() {
+  let total = 0, passed = 0, failed = 0, skipped = 0;
+  SECTIONS.forEach(s => {
+    s.tests.forEach(t => {
+      total++;
+      const st = state[s.id + '_' + t.tc]?.status;
+      if (st === 'pass') passed++;
+      else if (st === 'fail') failed++;
+      else if (st === 'skip') skipped++;
+    });
+  });
+  return { total, passed, failed, skipped, completed: passed + failed + skipped };
+}
+
+function getSectionStats(sectionId) {
+  const section = SECTIONS.find(s => s.id === sectionId);
+  let total = 0, passed = 0, failed = 0, skipped = 0;
+  section.tests.forEach(t => {
+    total++;
+    const st = state[sectionId + '_' + t.tc]?.status;
+    if (st === 'pass') passed++;
+    else if (st === 'fail') failed++;
+    else if (st === 'skip') skipped++;
+  });
+  return { total, passed, failed, skipped, completed: passed + failed + skipped };
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '<div class="sidebar-label">Test Sections</div>';
+  SECTIONS.forEach(s => {
+    const stats = getSectionStats(s.id);
+    const isComplete = stats.completed === stats.total;
+    const cls = [
+      'nav-item',
+      activeSection === s.id ? 'active' : '',
+      isComplete ? 'complete' : ''
+    ].filter(Boolean).join(' ');
+    html += `<div class="${cls}" data-section="${s.id}">
+      <span>${s.code}</span>
+      <span style="flex:1;font-size:0.78rem">${s.title}</span>
+      <span class="nav-progress">${stats.completed}/${stats.total}</span>
+    </div>`;
+  });
+
+  html += '<div class="section-divider"></div>';
+  html += '<div class="sidebar-label">Quick Actions</div>';
+  html += `<div class="nav-item" id="navExport" style="color:var(--wfp-blue)">&#x2913; Export Results</div>`;
+  html += `<div class="nav-item" id="navReset" style="color:var(--red)">&#x21BB; Reset All</div>`;
+
+  sb.innerHTML = html;
+
+  sb.querySelectorAll('[data-section]').forEach(el => {
+    el.addEventListener('click', () => {
+      activeSection = el.dataset.section;
+      render();
+    });
+  });
+
+  document.getElementById('navExport')?.addEventListener('click', exportCSV);
+  document.getElementById('navReset')?.addEventListener('click', () => {
+    if (confirm('Reset all test results? This cannot be undone.')) {
+      state = {};
+      initState();
+      saveState();
+      render();
+    }
+  });
+}
+
+function renderHeader() {
+  const stats = getStats();
+  document.getElementById('hPass').innerHTML = `&#10003; ${stats.passed}`;
+  document.getElementById('hFail').innerHTML = `&#10007; ${stats.failed}`;
+  document.getElementById('hSkip').innerHTML = `&#8212; ${stats.skipped}`;
+  document.getElementById('progressLabel').textContent = `${stats.completed} / ${stats.total} COMPLETE`;
+  document.getElementById('progressFill').style.width = `${(stats.completed / stats.total * 100) || 0}%`;
+}
+
+function renderMain() {
+  const section = SECTIONS.find(s => s.id === activeSection);
+  const stats = getStats();
+  const sStats = getSectionStats(section.id);
+  const newCount = section.tests.filter(t => t.isNew).length;
+
+  let html = '';
+
+  // Summary bar
+  html += `<div class="summary-bar">
+    <div class="summary-card s-total"><div class="val">${stats.total}</div><div class="lbl">Total Tests</div></div>
+    <div class="summary-card s-pass"><div class="val">${stats.passed}</div><div class="lbl">Passed</div></div>
+    <div class="summary-card s-fail"><div class="val">${stats.failed}</div><div class="lbl">Failed</div></div>
+    <div class="summary-card s-skip"><div class="val">${stats.skipped}</div><div class="lbl">Skipped</div></div>
+    <div class="summary-card s-rate"><div class="val">${stats.completed ? Math.round(stats.passed / stats.completed * 100) : 0}%</div><div class="lbl">Pass Rate</div></div>
+  </div>`;
+
+  // Section header
+  html += `<div class="section-header">
+    <h1>${section.code}: ${section.title}</h1>
+    <p>${section.desc}</p>
+    <div style="display:flex;gap:1rem;margin-top:0.5rem;align-items:center">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted)">${sStats.completed}/${sStats.total} complete</span>
+      ${newCount ? `<span class="new-badge">${newCount} new from round 2</span>` : ''}
+    </div>
+    <div class="section-progress-bar"><div class="section-progress-fill" style="width:${(sStats.completed/sStats.total*100)||0}%"></div></div>
+  </div>`;
+
+  // Filters
+  html += `<div class="filter-bar">
+    <button class="filter-btn ${activeFilter==='all'?'active':''}" data-filter="all">All (${section.tests.length})</button>
+    <button class="filter-btn ${activeFilter==='pass'?'active':''}" data-filter="pass">Passed</button>
+    <button class="filter-btn ${activeFilter==='fail'?'active':''}" data-filter="fail">Failed</button>
+    <button class="filter-btn ${activeFilter==='skip'?'active':''}" data-filter="skip">Skipped</button>
+    <button class="filter-btn ${activeFilter==='pending'?'active':''}" data-filter="pending">Pending</button>
+    <button class="filter-btn ${activeFilter==='new'?'active-new':''}" data-filter="new">New (R2)</button>
+  </div>`;
+
+  // Test cards
+  section.tests.forEach(t => {
+    const key = section.id + '_' + t.tc;
+    const s = state[key] || { status: '', notes: '' };
+
+    // Filter
+    if (activeFilter === 'pass' && s.status !== 'pass') return;
+    if (activeFilter === 'fail' && s.status !== 'fail') return;
+    if (activeFilter === 'skip' && s.status !== 'skip') return;
+    if (activeFilter === 'pending' && s.status !== '') return;
+    if (activeFilter === 'new' && !t.isNew) return;
+
+    const cardCls = [
+      'test-card',
+      s.status === 'pass' ? 'passed' : '',
+      s.status === 'fail' ? 'failed' : '',
+      s.status === 'skip' ? 'skipped' : '',
+      t.isNew ? 'new-test' : ''
+    ].filter(Boolean).join(' ');
+
+    const prioHtml = t.priority ? `<span class="priority-tag ${t.priority}">${t.priority}</span>` : '';
+
+    html += `<div class="${cardCls}" data-key="${key}">
+      <div class="test-header">
+        <div class="status-dot"></div>
+        <div class="tc-id">${t.tc}</div>
+        <div class="tc-name">${t.name}</div>
+        ${t.isNew ? '<span class="new-badge">NEW</span>' : ''}
+        ${prioHtml}
+        <div class="tc-chevron">&#9654;</div>
+      </div>
+      <div class="test-body">
+        <div class="test-grid">
+          <div class="test-field">
+            <label>Steps</label>
+            <div class="content">${t.steps}</div>
+          </div>
+          <div class="test-field">
+            <label>Expected Result</label>
+            <div class="content">${t.expected}</div>
+          </div>
+        </div>
+        ${t.isNew ? '<div class="amendment-source">Source: Donor Portal Round 2 Amendments</div>' : ''}
+        <div class="test-actions">
+          <button class="btn btn-pass ${s.status==='pass'?'active':''}" data-action="pass" data-key="${key}">&#10003; Pass</button>
+          <button class="btn btn-fail ${s.status==='fail'?'active':''}" data-action="fail" data-key="${key}">&#10007; Fail</button>
+          <button class="btn btn-skip ${s.status==='skip'?'active':''}" data-action="skip" data-key="${key}">&#8212; Skip</button>
+          <button class="btn btn-reset" data-action="reset" data-key="${key}">Reset</button>
+        </div>
+        <textarea class="notes-input" placeholder="Add notes, defect reference, or screenshot link..." data-notes="${key}">${s.notes || ''}</textarea>
+      </div>
+    </div>`;
+  });
+
+  // Export bar
+  html += `<div class="export-bar">
+    <button class="btn-export" onclick="exportCSV()">&#x2913; Export as CSV</button>
+    <button class="btn-export secondary" onclick="exportJSON()">{ } Export as JSON</button>
+    <span style="margin-left:auto;font-size:0.75rem;color:var(--muted)">Results saved in session</span>
+  </div>`;
+
+  document.getElementById('mainContent').innerHTML = html;
+
+  // Event listeners
+  document.querySelectorAll('.test-header').forEach(el => {
+    el.addEventListener('click', () => {
+      el.parentElement.classList.toggle('expanded');
+    });
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(el => {
+    el.addEventListener('click', () => {
+      activeFilter = el.dataset.filter;
+      renderMain();
+    });
+  });
+
+  document.querySelectorAll('[data-action]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = el.dataset.key;
+      const action = el.dataset.action;
+      if (action === 'reset') {
+        state[key] = { status: '', notes: state[key]?.notes || '' };
+      } else {
+        state[key] = { ...state[key], status: action };
+      }
+      saveState();
+      render();
+    });
+  });
+
+  document.querySelectorAll('[data-notes]').forEach(el => {
+    el.addEventListener('input', (e) => {
+      const key = el.dataset.notes;
+      if (!state[key]) state[key] = { status: '', notes: '' };
+      state[key].notes = e.target.value;
+      saveState();
+    });
+    el.addEventListener('click', (e) => e.stopPropagation());
+  });
+}
+
+function render() {
+  renderSidebar();
+  renderHeader();
+  renderMain();
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function exportCSV() {
+  let csv = 'Section,TC ID,Test Case,Status,Priority,New/Amended,Notes\n';
+  SECTIONS.forEach(s => {
+    s.tests.forEach(t => {
+      const key = s.id + '_' + t.tc;
+      const st = state[key] || {};
+      const notes = (st.notes || '').replace(/"/g, '""');
+      csv += `"${s.code}","${t.tc}","${t.name}","${st.status || 'pending'}","${t.priority || ''}","${t.isNew ? 'NEW' : ''}","${notes}"\n`;
+    });
+  });
+  download(csv, 'WFP_UAT_Results_' + new Date().toISOString().slice(0,10) + '.csv', 'text/csv');
+}
+
+function exportJSON() {
+  const data = { exported: new Date().toISOString(), sections: [] };
+  SECTIONS.forEach(s => {
+    const sectionData = { code: s.code, title: s.title, tests: [] };
+    s.tests.forEach(t => {
+      const key = s.id + '_' + t.tc;
+      const st = state[key] || {};
+      sectionData.tests.push({ tc: t.tc, name: t.name, status: st.status || 'pending', notes: st.notes || '', isNew: !!t.isNew, priority: t.priority || '' });
+    });
+    data.sections.push(sectionData);
+  });
+  download(JSON.stringify(data, null, 2), 'WFP_UAT_Results_' + new Date().toISOString().slice(0,10) + '.json', 'application/json');
+}
+
+function download(content, filename, type) {
+  const blob = new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+loadState();
+initState();
+render();
+</script>
+</body>
+</html>
