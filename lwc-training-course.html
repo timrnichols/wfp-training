@@ -1178,6 +1178,36 @@ it(<span class="str">'shows error state when Apex fails'</span>, <span class="kw
         <li><strong>TC 07.08:</strong> One-time and recurring receipts must be distinguishable on screen</li>
       </ul>
 
+      <h2>Lightning Studio — Your In-Browser Dev Tool</h2>
+      <p>Install the <a href="https://chromewebstore.google.com/detail/lightning-studio/ehkpneicmpbdejpoancidgkejlkahjgo" target="_blank" style="color:var(--wfp-blue);font-weight:600;">Lightning Studio Chrome extension</a> before you start testing. It runs directly against the Bu3 sandbox org and gives you access to component source, Apex, and live query tools without needing VS Code or a full dev setup.</p>
+
+      <div class="callout info">
+        <div class="callout-title">Setup — 30 seconds</div>
+        <p>Install from the Chrome Web Store, then log in to Bu3 sandbox in the same browser. The Lightning Studio icon in the toolbar will turn <strong>blue</strong> when it's connected and ready. If it stays grey after install, refresh the Salesforce tab.</p>
+      </div>
+
+      <h3>What you'll use it for</h3>
+      <table>
+        <tr><th>Feature</th><th>When to use it</th></tr>
+        <tr><td><strong>Browse LWC source</strong></td><td>Read the HTML/JS/CSS of any portal component directly in the browser — no repo access needed. Useful for understanding what a component is supposed to render before filing a bug.</td></tr>
+        <tr><td><strong>Browse Apex Classes</strong></td><td>Read <code>DonorAuthController</code>, <code>DonorPortalController</code>, etc. to understand what the Apex is querying and what it returns — helps diagnose data issues.</td></tr>
+        <tr><td><strong>Anonymous Apex (beta)</strong></td><td>Run a quick Apex snippet against the sandbox — e.g. query a specific Contact's Gift Commitments to verify test data before running TC 03.02.</td></tr>
+        <tr><td><strong>REST API Explorer (beta)</strong></td><td>Call Salesforce REST endpoints directly to inspect raw response payloads — useful when a component shows unexpected data and you want to rule out the API layer.</td></tr>
+        <tr><td><strong>SOQL to GraphQL</strong></td><td>Write a SOQL query, run it, inspect results — faster than opening Salesforce Inspector or Developer Console for data checks.</td></tr>
+        <tr><td><strong>Code Comparison (diff)</strong></td><td>Compare two versions of a component or Apex class — handy after Tim deploys a fix and you want to confirm what changed before re-running a failed test case.</td></tr>
+        <tr><td><strong>Backup as ZIP</strong></td><td>Download a component or full metadata backup — useful if you need a snapshot before a big deployment.</td></tr>
+      </table>
+
+      <div class="callout tip">
+        <div class="callout-title">Tester's workflow with Lightning Studio</div>
+        <p>When a test case fails — say TC 04.04 (gift upgrade not persisting) — open Lightning Studio, find the Apex class handling the update, read the method, then use Anonymous Apex to query the Gift Commitment record directly. This tells you in under a minute whether the bug is in the LWC, the Apex, or the data — before writing a defect report.</p>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">⚠ Bu3 Sandbox only</div>
+        <p>Only use Lightning Studio against the Bu3 sandbox (<code>wfp--bu3.sandbox.my.salesforce.com</code>). Never connect it to a production org. The extension works purely locally — all data stays in your browser, nothing is sent to external servers.</p>
+      </div>
+
       <h2>Debugging Triage</h2>
       <table>
         <tr><th>Symptom</th><th>First place to look</th></tr>
@@ -1258,6 +1288,14 @@ disconnectedCallback()<span class="cmt">→ cleanup timers/listeners</span></cod
   message: <span class="str">'Your tax receipt is ready.'</span>,
   variant: <span class="str">'success'</span>  <span class="cmt">// success | error | warning | info</span>
 }));</code></pre>
+
+      <h2>Useful Dev Tools</h2>
+      <table>
+        <tr><th>Tool</th><th>What it does</th><th>Link</th></tr>
+        <tr><td><strong>Lightning Studio</strong></td><td>Browse LWC/Apex source, run Anonymous Apex, SOQL queries, REST API calls, code diff — all from Chrome, connected to Bu3</td><td><a href="https://chromewebstore.google.com/detail/lightning-studio/ehkpneicmpbdejpoancidgkejlkahjgo" target="_blank" style="color:var(--wfp-blue)">Chrome Web Store</a></td></tr>
+        <tr><td><strong>Salesforce Inspector Reloaded</strong></td><td>Inspect field values on any record, run SOQL, view metadata — good complement to Lightning Studio</td><td>Chrome Web Store</td></tr>
+        <tr><td><strong>Setup → Debug Logs</strong></td><td>Add a trace flag for a test user, reproduce the issue, read the log in Salesforce Setup</td><td>In Bu3 org</td></tr>
+      </table>
 
       <h2>Useful Salesforce Dev Links</h2>
       <ul>
