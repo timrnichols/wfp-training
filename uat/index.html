@@ -29,6 +29,93 @@
     --purple-bg: #F3EEF9;
   }
 
+  /* Password gate */
+  .pw-gate {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow', sans-serif;
+  }
+  .pw-gate.hidden { display: none; }
+  .pw-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 2.5rem;
+    width: 380px;
+    max-width: 90vw;
+    box-shadow: 0 8px 32px rgba(0,99,176,0.1);
+    text-align: center;
+  }
+  .pw-badge {
+    display: inline-block;
+    background: var(--wfp-blue);
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 0.35rem 0.7rem;
+    border-radius: 3px;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+  }
+  .pw-card h2 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--wfp-navy);
+    margin-bottom: 0.35rem;
+  }
+  .pw-card p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+  .pw-input {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    background: var(--surface);
+    text-align: center;
+    letter-spacing: 0.1em;
+    transition: border-color 0.2s;
+  }
+  .pw-input:focus { outline: none; border-color: var(--wfp-blue); box-shadow: 0 0 0 3px rgba(0,153,216,0.12); }
+  .pw-input.error { border-color: var(--red); animation: shake 0.4s ease; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .pw-submit {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.65rem;
+    font-family: 'Barlow', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border: none;
+    border-radius: 5px;
+    background: var(--wfp-blue);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .pw-submit:hover { background: var(--wfp-blue-dark); }
+  .pw-error-msg {
+    font-size: 0.78rem;
+    color: var(--red);
+    margin-top: 0.75rem;
+    min-height: 1.2em;
+    font-weight: 600;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -545,6 +632,21 @@
 </head>
 <body>
 
+<!-- Password Gate -->
+<div class="pw-gate" id="pwGate">
+  <div class="pw-card">
+    <div class="pw-badge">Restricted Access</div>
+    <h2>UAT Runner</h2>
+    <p>This page is for authorized WFP testers only. Enter the access code to continue.</p>
+    <input type="password" class="pw-input" id="pwInput" placeholder="Access code" autocomplete="off">
+    <button class="pw-submit" id="pwSubmit">Enter</button>
+    <div class="pw-error-msg" id="pwError"></div>
+  </div>
+</div>
+
+<!-- App (hidden until auth) -->
+<div id="appWrap" style="display:none">
+
 <div class="header">
   <div class="logo">
     <div class="logo-badge">UAT<br>RUNNER</div>
@@ -569,6 +671,8 @@
   <nav class="sidebar" id="sidebar"></nav>
   <main class="main" id="mainContent"></main>
 </div>
+
+</div><!-- /appWrap -->
 
 <script>
 // ============================================================
@@ -1102,9 +1206,58 @@ function download(content, filename, type) {
 // ============================================================
 // INIT
 // ============================================================
-loadState();
-initState();
-render();
+function bootApp() {
+  loadState();
+  initState();
+  render();
+}
+
+// ============================================================
+// PASSWORD GATE
+// ============================================================
+const PW_HASH = '2485cd13'; // simple hash of 'wfp-uat-2026'
+function simpleHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) - h) + str.charCodeAt(i);
+    h |= 0;
+  }
+  return (h >>> 0).toString(16).slice(0, 8);
+}
+
+function checkAuth() {
+  return localStorage.getItem('wfp_uat_auth') === PW_HASH;
+}
+
+function unlock() {
+  document.getElementById('pwGate').classList.add('hidden');
+  document.getElementById('appWrap').style.display = '';
+  bootApp();
+}
+
+if (checkAuth()) {
+  unlock();
+} else {
+  const inp = document.getElementById('pwInput');
+  const btn = document.getElementById('pwSubmit');
+  const err = document.getElementById('pwError');
+
+  function tryAuth() {
+    const val = inp.value.trim();
+    if (simpleHash(val) === PW_HASH) {
+      localStorage.setItem('wfp_uat_auth', PW_HASH);
+      unlock();
+    } else {
+      inp.classList.add('error');
+      err.textContent = 'Incorrect access code. Please try again.';
+      setTimeout(() => inp.classList.remove('error'), 500);
+    }
+  }
+
+  btn.addEventListener('click', tryAuth);
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryAuth(); });
+  inp.focus();
+}
 </script>
 </body>
 </html>
