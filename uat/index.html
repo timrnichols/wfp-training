@@ -387,6 +387,28 @@
     border-radius: 3px;
     flex-shrink: 0;
   }
+  .r2-badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: #E0F2FE;
+    color: #0369A1;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .r3-badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: #FCE7F3;
+    color: #BE185D;
+    padding: 0.15rem 0.45rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
 
   .tc-chevron {
     color: var(--muted);
@@ -681,7 +703,7 @@
 const SECTIONS = [
   {
     id: "uat01", code: "UAT-01", title: "Design Kit & Branding",
-    desc: "Validate portal UI conformity to WFP Design Kit: color scheme, typography, spacing, responsive behaviour, and Round 2 amendments.",
+    desc: "Validate portal UI conformity to WFP Design Kit: color scheme, typography, spacing, responsive behaviour. Includes Round 2 & Round 3 amendments.",
     tests: [
       { tc: "01.01", name: "WFP color scheme applied", steps: "1. Open portal URL in Chrome\n2. Inspect header, footer, button elements\n3. Verify primary blue (#0A6EB4) and accent colors match WFP brand", expected: "All UI elements use WFP brand colors per the Design Kit" },
       { tc: "01.02", name: "Typography matches WFP spec", steps: "1. Inspect heading fonts and body text\n2. Verify font family, sizes, and weights\n3. Check consistency across all pages", expected: "Typography matches WFP Design Kit specifications" },
@@ -700,11 +722,16 @@ const SECTIONS = [
       { tc: "01.15", name: "Footer links updated", steps: "1. Verify Privacy → donate.wfp.org/1279/p/privacy-policy/\n2. Verify T&C → donate.wfp.org/1322/p/terms-and-conditions/\n3. Verify FAQ → donate.wfp.org/2020/p/faq/\n4. Verify Contact Us REMOVED\n5. Verify TikTok icon → tiktok.com/@worldfoodprogramme", expected: "Footer has correct links. Contact Us removed. TikTok added.", isNew: true, priority: "high" },
       { tc: "01.16", name: "Need Help – no Call Us", steps: "1. Locate Need Help section\n2. Verify Call Us is removed\n3. Verify remaining links work", expected: "Call Us removed. Live Chat, Email Us, WhatsApp functional.", isNew: true, priority: "high" },
       { tc: "01.17", name: "URL paths match domain spec", steps: "1. Navigate all pages\n2. Verify account.donate.wfp.org/{page}\n3. Check: /your-impact, /donation-receipts, /contact-details, /login, /preferences, /404-not-found", expected: "All URL paths match specified domain structure", isNew: true, priority: "critical" },
+      { tc: "01.18", name: "Muted colour palette – blue for buttons only", steps: "1. Inspect all CTAs and buttons\n2. Verify primary buttons use WFP blue (not red)\n3. Verify overall palette is muted with blue used predominantly for interactive elements\n4. Check shadows vs borders on widgets", expected: "Blue used for buttons/CTAs. Red minimised. Muted palette throughout.", isNew: true, priority: "high", source: "R2" },
+      { tc: "01.19", name: "Pages scroll to top on navigation", steps: "1. Scroll down on any page\n2. Click a sidebar menu link\n3. Verify new page loads at top\n4. Repeat across all pages", expected: "Each page navigation scrolls to top of page automatically", isNew: true, priority: "medium", source: "R2" },
+      { tc: "01.20", name: "Supporter ID & RG Pledge ID font consistency", steps: "1. Locate Supporter ID on home page\n2. Locate RG Pledge ID on Your Impact\n3. Verify both use same font as body text", expected: "IDs rendered in same font as surrounding text (not monospace or different weight)", isNew: true, priority: "low", source: "R2" },
+      { tc: "01.21", name: "Hero image – faces with eye contact", steps: "1. Locate hero/banner image on home or impact page\n2. Verify image includes faces\n3. Verify need-based imagery, eye contact, not smiling per brand guidelines", expected: "Hero image shows need-based imagery with faces and eye contact", isNew: true, priority: "medium", source: "R3" },
+      { tc: "01.22", name: "RG pledges displayed in rows (not boxes)", steps: "1. View home page with active RG pledges\n2. Verify donations display in full-width rows\n3. Verify clear hierarchy and readability\n4. Confirm max 2–3 shown on home (rest on Your Impact)", expected: "Active RG pledges displayed in row format spanning full width", isNew: true, priority: "high", source: "R2" },
     ]
   },
   {
     id: "uat02", code: "UAT-02", title: "Authentication System",
-    desc: "Validate email-based OTP flow, tiered authentication levels (Level 1 / Level 3), session management, and security controls.",
+    desc: "Validate email-based OTP flow, tiered authentication levels (Level 1 / Level 3), session management, security controls, and one-click journeys (R2/R3).",
     tests: [
       { tc: "02.01", name: "Landing page renders with email input", steps: "1. Navigate to portal URL\n2. Verify landing page loads\n3. Confirm email input field", expected: "Landing page loads with email input and submit button" },
       { tc: "02.02", name: "Valid email triggers OTP", steps: "1. Enter Donor A's email\n2. Click submit\n3. Check inbox within 30s", expected: "OTP arrives within 30s with 6-digit code and WFP branding" },
@@ -723,11 +750,13 @@ const SECTIONS = [
       { tc: "02.15", name: "Level 3 Auth – Contact Details (OTP on edit)", steps: "1. Navigate to Contact Details (Level 3)\n2. Verify OTP on entry\n3. View hashed data\n4. Edit → Save → second OTP triggered", expected: "Dual OTP: on entry and on save. Hashed view state.", isNew: true, priority: "critical" },
       { tc: "02.16", name: "Level 1 session – one hour validity", steps: "1. Enter via Level 1 link\n2. Navigate freely for 1 hour\n3. Verify session expires after", expected: "Level 1 session lasts 1 hour within single page", isNew: true, priority: "high" },
       { tc: "02.17", name: "Unregistered email – no OTP sent", steps: "1. Enter unregistered email\n2. Submit\n3. Check error appears\n4. Verify NO OTP email", expected: "Error shown. No OTP sent for unregistered emails.", isNew: true, priority: "high" },
+      { tc: "02.18", name: "Lapsed/refunded donor can login", steps: "1. Authenticate as a lapsed donor (all RGs canceled)\n2. Verify OTP flow works\n3. Verify portal loads with appropriate data\n4. Test refunded donor similarly", expected: "Lapsed and refunded donors can still log in and see their historical data", isNew: true, priority: "medium", source: "R2" },
+      { tc: "02.19", name: "One-click journeys – menu restricted", steps: "1. Enter via one-click email link (e.g. unsubscribe)\n2. Verify only target page is interactive\n3. Click any other menu item\n4. Verify auth prompt/disclaimer\n5. Confirm user cannot freely browse without re-authenticating", expected: "One-click entry restricts access to target page only. Other pages require auth.", isNew: true, priority: "critical", source: "R3" },
     ]
   },
   {
     id: "uat03", code: "UAT-03", title: "Home Page & Dashboard",
-    desc: "Validate donor dashboard, giving summary, quick actions, FAQ, Help Center, and Round 2 updates.",
+    desc: "Validate donor dashboard, giving summary, quick actions, FAQ, Help Center. Includes R2 country-specific visibility and status badges.",
     tests: [
       { tc: "03.01", name: "Home page loads within 3s", steps: "1. Authenticate as Donor A\n2. Measure load time\n3. Use DevTools", expected: "Page fully renders within 3 seconds" },
       { tc: "03.02", name: "Active Monthly Donations display", steps: "1. Authenticate as Donor A\n2. Review Active Monthly Donations card", expected: "All active Gift Commitments with amount, frequency, next date" },
@@ -745,11 +774,15 @@ const SECTIONS = [
       { tc: "03.14", name: "New RG donation disclaimer", steps: "1. Authenticate as donor with recent new RG\n2. Check homepage disclaimer", expected: "Disclaimer advises checking new RG within couple of hours", isNew: true, priority: "high" },
       { tc: "03.15", name: "Donation status labels", steps: "1. View donations with various statuses\n2. Verify labels", expected: "'Completed' for success, 'Canceled' for canceled/refunded", isNew: true, priority: "low" },
       { tc: "03.16", name: "Column alignment – RG vs outdated", steps: "1. View both active and outdated sections\n2. Check column alignment", expected: "Columns aligned consistently between sections", isNew: true, priority: "medium" },
+      { tc: "03.17", name: "Quick actions – country-specific visibility", steps: "1. Authenticate as donor from non-tax country\n2. Verify Quick Actions section adapts\n3. Check that irrelevant actions (e.g. View Receipts for non-tax country) are hidden or adjusted\n4. Authenticate as tax-country donor and verify all 4 shown", expected: "Quick Actions adapt by country – 2/3 shown for non-tax, all 4 for tax countries", isNew: true, priority: "high", source: "R2" },
+      { tc: "03.18", name: "Lapsed/outdated RGs in dropdown", steps: "1. Authenticate as donor with lapsed RGs\n2. Locate outdated/lapsed section\n3. Verify displayed separately from active (e.g. collapsible dropdown)\n4. Verify it sits outside Active Monthly Donations widget", expected: "Lapsed RGs shown in separate expandable section, distinct from active donations", isNew: true, priority: "medium", source: "R2" },
+      { tc: "03.19", name: "Data lag disclaimer – new donations", steps: "1. Authenticate as donor with very recent donation (< 30 min)\n2. If donation not yet visible, verify disclaimer message\n3. Verify messaging advises checking back in a few minutes to 30 minutes", expected: "Portal shows disclaimer for data lag. Advises supporter to check back shortly.", isNew: true, priority: "medium", source: "R2" },
+      { tc: "03.20", name: "Status badges display correctly", steps: "1. View donations with various statuses\n2. Verify badges: Active, Canceled, Completed (one-time)\n3. Verify receipt badges: Ready, In Progress, Incomplete\n4. Verify badge styling and colours", expected: "Status badges render with correct labels and colours for all states", isNew: true, priority: "medium", source: "R2" },
     ]
   },
   {
     id: "uat04", code: "UAT-04", title: "Increase Impact (Your Impact)",
-    desc: "Validate donation increase, amount suggestions, impact messaging, upgrade controls, and Round 2 validation rules.",
+    desc: "Validate donation increase, amount suggestions, impact messaging, upgrade controls, failure handling, and R2/R3 UX refinements.",
     tests: [
       { tc: "04.01", name: "Suggested amounts display", steps: "1. Authenticate\n2. Navigate to Increase Impact\n3. Review amounts", expected: "Three suggestions: current, -20%, +20%" },
       { tc: "04.02", name: "Select suggested amount", steps: "1. Click +20%\n2. Verify highlight\n3. Review impact message", expected: "Selected highlighted; impact message updates" },
@@ -766,11 +799,18 @@ const SECTIONS = [
       { tc: "04.13", name: "Banner admin-controllable", steps: "1. Toggle banner visibility as admin\n2. Verify show/hide\n3. Check single-RG logic", expected: "Banner controlled by admin; shown only for single-RG supporters", isNew: true, priority: "low" },
       { tc: "04.14", name: "Dynamic campaign in upgrade text", steps: "1. View upgrade for donor with known campaign\n2. Verify campaign name appears in text", expected: "Text includes most recent RG campaign name", isNew: true, priority: "low" },
       { tc: "04.15", name: "Upgraded price reflected", steps: "1. Complete upgrade\n2. Return to home\n3. Verify new amount", expected: "New price reflected on home page and Salesforce", isNew: true, priority: "high" },
+      { tc: "04.16", name: "\"Save more lives\" subtitle", steps: "1. Navigate to Increase Impact / Your Impact\n2. Locate the Increase Gift CTA\n3. Verify subtitle text reads \"Save more lives\"", expected: "Subtitle under Increase Gift reads \"Save more lives\"", isNew: true, priority: "low", source: "R2" },
+      { tc: "04.17", name: "Distinguish which RG is being upgraded", steps: "1. Authenticate as donor with multiple active RGs\n2. Navigate to upgrade widget\n3. Verify it is clear which RG is selected for upgrade\n4. Verify current amount vs new amount displayed", expected: "Upgrade widget clearly shows which RG is being upgraded with current vs new amount", isNew: true, priority: "high", source: "R2" },
+      { tc: "04.18", name: "Hide upgrade if recently upgraded", steps: "1. Complete an upgrade\n2. Return to Your Impact page\n3. Verify upgrade prompt is hidden or shows \"recently upgraded\" state\n4. Verify prompt returns after configured period", expected: "Upgrade prompt hidden temporarily after recent upgrade", isNew: true, priority: "low", source: "R2" },
+      { tc: "04.19", name: "Upgrade failure handling", steps: "1. Simulate an upgrade failure (e.g. payment method issue)\n2. Verify user notification on portal\n3. Check for email notification about failure\n4. Verify old amount restored or disclaimer shown", expected: "User notified of upgrade failure. Old amount restored. Email sent.", isNew: true, priority: "high", source: "R2" },
+      { tc: "04.20", name: "Button hierarchy in upgrade widget", steps: "1. View upgrade widget with suggested amounts\n2. Verify the \"Increase to XX per month\" option is styled as primary CTA\n3. Verify first two options are secondary\n4. Check visual hierarchy is clear", expected: "Primary CTA is the recommended upgrade amount. Clear button hierarchy.", isNew: true, priority: "medium", source: "R3" },
+      { tc: "04.21", name: "Your Impact page for non-RG supporters", steps: "1. Authenticate as one-time donor only (no RG)\n2. Navigate to Your Impact\n3. Verify page content adapts (no active RG section)\n4. Check for messaging encouraging RG sign-up (if applicable)", expected: "Page adapts for non-RG supporters. Menu remains active. Appropriate messaging.", isNew: true, priority: "medium", source: "R3" },
+      { tc: "04.22", name: "Shopping list copy consistency", steps: "1. View upgrade impact messaging on Home page\n2. View same messaging on Your Impact page\n3. Compare copy and design\n4. Verify consistency", expected: "Impact/shopping list copy and design is consistent between Home and Your Impact pages", isNew: true, priority: "medium", source: "R3" },
     ]
   },
   {
     id: "uat05", code: "UAT-05", title: "Contact Details",
-    desc: "Validate contact view, inline validation, phone prefix, language preferences, mailing address logic, and Level 3 auth.",
+    desc: "Validate contact view, inline validation, phone prefix, language preferences, mailing address logic, Level 3 auth, and R3 duplicate handling.",
     tests: [
       { tc: "05.01", name: "Contact details display", steps: "1. Authenticate\n2. Navigate to Contact Details\n3. Verify fields", expected: "Name, Email, Address displayed (read-only, hashed)" },
       { tc: "05.02", name: "Only phone editable", steps: "1. Try editing First Name, Email\n2. Verify Phone editable", expected: "All read-only except Phone" },
@@ -786,11 +826,13 @@ const SECTIONS = [
       { tc: "05.12", name: "Mailing address – tax countries only", steps: "1. Set country to CA (tax)\n2. Verify mandatory address\n3. Set non-tax country\n4. Verify optional", expected: "Mandatory for CA, FR, DE, NL, AU. Optional otherwise.", isNew: true, priority: "critical" },
       { tc: "05.13", name: "Country selector expands fields", steps: "1. Select tax country\n2. Verify address fields expand\n3. Select non-tax\n4. Verify collapse", expected: "Dynamic show/hide based on tax eligibility", isNew: true, priority: "critical" },
       { tc: "05.14", name: "Unsaved changes – toast & block", steps: "1. Make change, don't save\n2. Click sidebar menu\n3. Verify toast\n4. Verify navigation blocked", expected: "Toast reminder. Navigation blocked until saved.", isNew: true, priority: "high" },
+      { tc: "05.15", name: "Email validation", steps: "1. Navigate to Contact Details\n2. Enter invalid email format in email field (if editable)\n3. Verify inline validation triggers\n4. Enter valid email and verify acceptance", expected: "Email field validates format with inline messaging", isNew: true, priority: "medium", source: "R3" },
+      { tc: "05.16", name: "Duplicate contact handling", steps: "1. If donor has potential duplicate records in SF\n2. Verify portal displays primary/correct record\n3. Verify no duplicate data confusion\n4. Check if \"primary\" label used for email/phone/address", expected: "Portal displays correct primary record. No duplicate confusion.", isNew: true, priority: "medium", source: "R3" },
     ]
   },
   {
     id: "uat06", code: "UAT-06", title: "Preferences Management",
-    desc: "Validate communication preferences, consent toggles, language, data privacy, and unsaved changes warning.",
+    desc: "Validate communication preferences, consent toggles, language, data privacy, unsaved changes warning, and R3 language change prompt.",
     tests: [
       { tc: "06.01", name: "Current consent statuses", steps: "1. Authenticate\n2. Navigate to Preferences\n3. Verify toggles", expected: "All channel toggles show current status" },
       { tc: "06.02", name: "Toggle – opt in", steps: "1. Toggle opted-out → opted-in\n2. Save", expected: "Toggle updated; SF Contact Point Consent updated" },
@@ -802,11 +844,13 @@ const SECTIONS = [
       { tc: "06.08", name: "Save confirmation message", steps: "1. Make change\n2. Save", expected: "Success message displayed" },
       { tc: "06.09", name: "Labels in selected language", steps: "1. Switch to French\n2. Navigate to Preferences", expected: "All labels in French" },
       { tc: "06.10", name: "Unsaved changes – toast & block", steps: "1. Toggle a preference\n2. Don't save\n3. Click sidebar menu\n4. Verify toast and block", expected: "Toast reminder. Navigation blocked until saved.", isNew: true, priority: "high" },
+      { tc: "06.11", name: "Language change – portal updates + save prompt", steps: "1. Go to Preferences\n2. Change preferred communication language\n3. Verify portal language updates immediately\n4. Verify prompt appears reminding to save before navigating away", expected: "Portal language updates on change. Save prompt prevents losing unsaved preference.", isNew: true, priority: "high", source: "R3" },
+      { tc: "06.12", name: "Marketing Cloud privacy toggle default", steps: "1. Navigate to Preferences\n2. Locate Marketing/Privacy toggle\n3. Verify default state (on/off) matches business rules\n4. Toggle and save", expected: "Marketing Cloud privacy toggle shows correct default state per business config", isNew: true, priority: "medium", source: "R3" },
     ]
   },
   {
     id: "uat07", code: "UAT-07", title: "Donation Receipts",
-    desc: "Validate receipt listing, PDF generation (CA/NL/FR), country disclaimers (DE/AU/ROW), language logic, and receipt icons.",
+    desc: "Validate receipt listing, PDF generation (CA/NL/FR), country disclaimers (DE/AU/ROW), language logic, receipt icons, and R2/R3 receipt types.",
     tests: [
       { tc: "07.01", name: "Receipt list by year", steps: "1. Authenticate as Donor A (CA)\n2. Navigate to Donation Receipts\n3. Select year", expected: "Eligible transactions for selected year" },
       { tc: "07.02", name: "Eligible years populated", steps: "1. Check year selector", expected: "Only years with eligible transactions appear" },
@@ -827,6 +871,11 @@ const SECTIONS = [
       { tc: "07.17", name: "Receipt language logic", steps: "1. FR donor with German pref → receipt in FR\n2. CA donor with EN pref → receipt in EN\n3. Change preference, verify change", expected: "EN/FR only. Language by pref or country default.", isNew: true, priority: "high" },
       { tc: "07.18", name: "Annual receipt disclaimer", steps: "1. View when annual receipt emitted\n2. Verify disclaimer text", expected: "Disclaimer displayed for annual receipt emission", isNew: true, priority: "low" },
       { tc: "07.19", name: "Multi-country donor mixed view", steps: "1. Donor with multi-country donations\n2. View receipts\n3. Verify mix of downloads and disclaimers", expected: "Combination of receipt downloads and disclaimers per country", isNew: true, priority: "medium" },
+      { tc: "07.20", name: "Receipt icons – grey ready, blue download", steps: "1. View receipt list\n2. Verify ready status icons are grey\n3. Verify individual download buttons are blue\n4. Verify Download All button has distinct visual hierarchy", expected: "Ready icons grey. Download buttons blue. Clear hierarchy between individual and Download All.", isNew: true, priority: "medium", source: "R2" },
+      { tc: "07.21", name: "Remove Previous year receipts label", steps: "1. View receipts spanning multiple years\n2. Verify no redundant Previous year receipts heading\n3. Verify year selector is sufficient for navigation", expected: "No Previous year receipts label shown. Year selector used instead.", isNew: true, priority: "low", source: "R2" },
+      { tc: "07.22", name: "Two receipt types only", steps: "1. View Donation Receipts page\n2. Verify only two receipt types: Annual RG monthly receipts and Single one-time SG receipts\n3. Verify no extraneous receipt categories", expected: "Only two receipt types displayed: annual RG monthly and single one-time", isNew: true, priority: "medium", source: "R3" },
+      { tc: "07.23", name: "Historic receipts persist after address change", steps: "1. Authenticate as donor who changed from tax to non-tax country\n2. Navigate to Donation Receipts\n3. Verify historic receipts from tax-effective period still visible\n4. Verify current disclaimer reflects new country", expected: "Historic receipts remain accessible even after country change. Current disclaimer updated.", isNew: true, priority: "medium", source: "R2" },
+      { tc: "07.24", name: "Email download link from email", steps: "1. Trigger receipt email notification\n2. Open email\n3. Click download link in email\n4. Verify receipt downloads or redirects to portal", expected: "Download link in receipt email works correctly", isNew: true, priority: "medium", source: "R2" },
     ]
   },
   {
@@ -847,7 +896,7 @@ const SECTIONS = [
   },
   {
     id: "uat09", code: "UAT-09", title: "Cross-Browser & Responsive",
-    desc: "Validate rendering and functionality across browsers and viewports. Round 2: mobile back button.",
+    desc: "Validate rendering and functionality across browsers and viewports. R2: mobile back button, cookie banner.",
     tests: [
       { tc: "09.01", name: "Chrome desktop", steps: "1. Chrome (latest) at 1024px+\n2. Full auth + navigation", expected: "All pages correct; no layout issues" },
       { tc: "09.02", name: "Safari desktop", steps: "1. Safari (latest) at 1024px+\n2. Full flow", expected: "All pages correct" },
@@ -858,6 +907,7 @@ const SECTIONS = [
       { tc: "09.07", name: "iOS Safari mobile", steps: "1. Open on iPhone Safari\n2. Full flow", expected: "All features functional" },
       { tc: "09.08", name: "Android Chrome mobile", steps: "1. Open on Android Chrome\n2. Full flow", expected: "All features functional" },
       { tc: "09.09", name: "Mobile back button functional", steps: "1. On mobile, navigate pages\n2. Tap back button\n3. Verify correct navigation", expected: "Back button works correctly on mobile", isNew: true, priority: "high" },
+      { tc: "09.10", name: "Cookie banner display (if applicable)", steps: "1. Open portal in fresh incognito session\n2. Check if cookie banner appears\n3. If present, verify it follows WFP/SX guidelines\n4. Verify accept/decline functionality", expected: "Cookie banner displays per privacy policy requirements (if applicable for MVP)", isNew: true, priority: "low", source: "R2" },
     ]
   },
   {
@@ -874,7 +924,7 @@ const SECTIONS = [
   },
   {
     id: "uat11", code: "UAT-11", title: "End-to-End Workflows",
-    desc: "Complete donor journeys validating integration of all components including tiered auth and country-specific flows.",
+    desc: "Complete donor journeys: tiered auth, country-specific flows, lapsed donors, multi-RG upgrades, one-click journeys (R2/R3).",
     tests: [
       { tc: "11.01", name: "E2E: CA donor full journey", steps: "1. Portal as Donor A (CA)\n2. OTP auth\n3. Review dashboard\n4. Increase gift\n5. Update phone\n6. Change consent\n7. Download CA receipt\n8. Switch to French\n9. Logout", expected: "All steps complete; data persists in SF" },
       { tc: "11.02", name: "E2E: NL donor receipt flow", steps: "1. Donor B (NL)\n2. OTP auth\n3. Donation Receipts\n4. Download NL receipt\n5. Email receipt\n6. Verify email", expected: "ANBI receipt delivered correctly" },
@@ -886,11 +936,14 @@ const SECTIONS = [
       { tc: "11.08", name: "E2E: DE/AU donor disclaimer", steps: "1. Auth as DE/AU donor\n2. Donation Receipts\n3. Verify disclaimer\n4. No downloads\n5. Navigate portal", expected: "Disclaimer shown. Portal otherwise works.", isNew: true, priority: "critical" },
       { tc: "11.09", name: "E2E: ROW donor no receipts", steps: "1. Auth as ROW donor\n2. Donation Receipts\n3. Disclaimer + email prompt\n4. Navigate portal", expected: "Disclaimer with email prompt. Portal functional.", isNew: true, priority: "critical" },
       { tc: "11.10", name: "E2E: Contact Details Level 3", steps: "1. Contact Details from email\n2. OTP auth\n3. View hashed data\n4. Edit\n5. Save → second OTP\n6. Verify SF update", expected: "Dual OTP flow, hashed view, save, SF update.", isNew: true, priority: "critical" },
+      { tc: "11.11", name: "E2E: Lapsed donor journey", steps: "1. Authenticate as lapsed donor (all RGs canceled)\n2. Verify dashboard shows lapsed state\n3. Navigate to Your Impact\n4. Verify outdated RGs displayed\n5. Navigate to Donation Receipts\n6. Verify historic receipts accessible\n7. Update preferences\n8. Logout", expected: "Lapsed donor sees full portal with historic data. All pages functional.", isNew: true, priority: "high", source: "R2" },
+      { tc: "11.12", name: "E2E: Multi-RG donor upgrade flow", steps: "1. Authenticate as donor with 3+ active RGs\n2. Navigate to Your Impact\n3. Verify all RGs listed\n4. Select specific RG to upgrade\n5. Verify correct RG selected (current vs new amount)\n6. Complete double confirmation\n7. Verify only selected RG updated in SF", expected: "Multi-RG upgrade flow correctly identifies and updates only the selected RG.", isNew: true, priority: "high", source: "R2/R3" },
+      { tc: "11.13", name: "E2E: One-click unsubscribe journey", steps: "1. Click unsubscribe/preferences link from email (Level 1)\n2. Verify Preferences page loads without OTP\n3. Change communication preference (e.g. opt out of email)\n4. Save\n5. Click another menu item\n6. Verify auth disclaimer\n7. Verify change persists in SF", expected: "One-click unsubscribe works end-to-end. Preference saved. Menu restricted.", isNew: true, priority: "critical", source: "R3" },
     ]
   },
   {
     id: "uat12", code: "UAT-12", title: "Platform & Integration",
-    desc: "NEW SECTION: Webchat, analytics, 404 page, admin controls, and reporting integrations from Round 2.",
+    desc: "Webchat, analytics, 404 page, admin controls, email logging, impact data, and reporting integrations (R2/R3).",
     tests: [
       { tc: "12.01", name: "Service Cloud Webchat embedded", steps: "1. Navigate any page\n2. Verify webchat widget\n3. Open webchat\n4. Verify NO chatbot/Einstein\n5. Verify live agent", expected: "Webchat visible. No chatbot. Live agent works.", isNew: true, priority: "critical" },
       { tc: "12.02", name: "Report a Problem – email link", steps: "1. Find 'Report a Problem'\n2. Click\n3. Verify mailto: supportercare@wfp.org\n4. Verify subject pre-populated", expected: "Opens email to supportercare@wfp.org with subject", isNew: true, priority: "medium" },
@@ -901,6 +954,10 @@ const SECTIONS = [
       { tc: "12.07", name: "URL param pre-population", steps: "1. Construct URL with upgrade value param\n2. Navigate to Impact\n3. Verify pre-selected amount", expected: "Upgrade values pre-populated from URL params", isNew: true, priority: "high" },
       { tc: "12.08", name: "Tableau data warehouse", steps: "1. Verify reporting data flows to Tableau\n2. Check data integrity\n3. Verify key metrics", expected: "Data flows correctly to Tableau", isNew: true, priority: "critical" },
       { tc: "12.09", name: "GA data layers", steps: "1. Open with GA debug extension\n2. Navigate key actions\n3. Verify data layer events\n4. Check enhanced ecommerce", expected: "Data layers at key points for GA tracking", isNew: true, priority: "high" },
+      { tc: "12.10", name: "Upgrade pre-population from email URL", steps: "1. Construct URL with upgrade amount param (e.g. ?upgrade=50)\n2. Navigate to portal via parameterized URL\n3. Authenticate\n4. Verify upgrade widget shows pre-populated amount\n5. Complete upgrade flow", expected: "Upgrade amount pre-populated from email URL parameters", isNew: true, priority: "high", source: "R2" },
+      { tc: "12.11", name: "A/B testing script injection", steps: "1. As admin, verify ability to add A/B testing scripts\n2. Verify Google Tag Manager integration\n3. Check that variations can be served\n4. Verify no impact on portal performance", expected: "Admin can inject A/B testing scripts via GTM. No performance degradation.", isNew: true, priority: "low", source: "R2" },
+      { tc: "12.12", name: "Salesforce email logging", steps: "1. Trigger portal actions that send emails (OTP, confirmation, receipt)\n2. Check Salesforce for email activity records\n3. Verify emails logged for reporting", expected: "Portal-triggered emails saved in Salesforce for reporting purposes", isNew: true, priority: "medium", source: "R2" },
+      { tc: "12.13", name: "Impact data saved in Salesforce", steps: "1. View impact metrics on portal (meals, families)\n2. Check Salesforce for corresponding impact data\n3. Verify data can be reused for other comms channels", expected: "Impact points (meals, families) stored in Salesforce for cross-channel use", isNew: true, priority: "medium", source: "R2" },
     ]
   }
 ];
@@ -1021,7 +1078,9 @@ function renderMain() {
   const section = SECTIONS.find(s => s.id === activeSection);
   const stats = getStats();
   const sStats = getSectionStats(section.id);
-  const newCount = section.tests.filter(t => t.isNew).length;
+  const newCount = section.tests.filter(t => t.isNew && !t.source).length;
+  const r2Count = section.tests.filter(t => t.source === 'R2' || t.source === 'R2/R3').length;
+  const r3Count = section.tests.filter(t => t.source === 'R3' || t.source === 'R2/R3').length;
 
   let html = '';
 
@@ -1040,7 +1099,9 @@ function renderMain() {
     <p>${section.desc}</p>
     <div style="display:flex;gap:1rem;margin-top:0.5rem;align-items:center">
       <span style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted)">${sStats.completed}/${sStats.total} complete</span>
-      ${newCount ? `<span class="new-badge">${newCount} new from round 2</span>` : ''}
+      ${newCount ? `<span class="new-badge">${newCount} new</span>` : ''}
+      ${r2Count ? `<span class="r2-badge">${r2Count} from R2</span>` : ''}
+      ${r3Count ? `<span class="r3-badge">${r3Count} from R3</span>` : ''}
     </div>
     <div class="section-progress-bar"><div class="section-progress-fill" style="width:${(sStats.completed/sStats.total*100)||0}%"></div></div>
   </div>`;
@@ -1052,7 +1113,9 @@ function renderMain() {
     <button class="filter-btn ${activeFilter==='fail'?'active':''}" data-filter="fail">Failed</button>
     <button class="filter-btn ${activeFilter==='skip'?'active':''}" data-filter="skip">Skipped</button>
     <button class="filter-btn ${activeFilter==='pending'?'active':''}" data-filter="pending">Pending</button>
-    <button class="filter-btn ${activeFilter==='new'?'active-new':''}" data-filter="new">New (R2)</button>
+    <button class="filter-btn ${activeFilter==='new'?'active-new':''}" data-filter="new">Amends</button>
+    <button class="filter-btn ${activeFilter==='r2'?'active':''}" data-filter="r2">R2</button>
+    <button class="filter-btn ${activeFilter==='r3'?'active':''}" data-filter="r3">R3</button>
   </div>`;
 
   // Test cards
@@ -1066,6 +1129,8 @@ function renderMain() {
     if (activeFilter === 'skip' && s.status !== 'skip') return;
     if (activeFilter === 'pending' && s.status !== '') return;
     if (activeFilter === 'new' && !t.isNew) return;
+    if (activeFilter === 'r2' && t.source !== 'R2' && t.source !== 'R2/R3') return;
+    if (activeFilter === 'r3' && t.source !== 'R3' && t.source !== 'R2/R3') return;
 
     const cardCls = [
       'test-card',
@@ -1082,7 +1147,10 @@ function renderMain() {
         <div class="status-dot"></div>
         <div class="tc-id">${t.tc}</div>
         <div class="tc-name">${t.name}</div>
-        ${t.isNew ? '<span class="new-badge">NEW</span>' : ''}
+        ${t.isNew && !t.source ? '<span class="new-badge">NEW</span>' : ''}
+        ${t.source === 'R2' ? '<span class="r2-badge">R2</span>' : ''}
+        ${t.source === 'R3' ? '<span class="r3-badge">R3</span>' : ''}
+        ${t.source === 'R2/R3' ? '<span class="r2-badge">R2/R3</span>' : ''}
         ${prioHtml}
         <div class="tc-chevron">&#9654;</div>
       </div>
@@ -1097,7 +1165,10 @@ function renderMain() {
             <div class="content">${t.expected}</div>
           </div>
         </div>
-        ${t.isNew ? '<div class="amendment-source">Source: Donor Portal Round 2 Amendments</div>' : ''}
+        ${t.isNew && !t.source ? '<div class="amendment-source">Source: Donor Portal Amends (for Tim)</div>' : ''}
+        ${t.source === 'R2' ? '<div class="amendment-source">Source: Round 2 Feedback</div>' : ''}
+        ${t.source === 'R3' ? '<div class="amendment-source">Source: Round 3 Feedback</div>' : ''}
+        ${t.source === 'R2/R3' ? '<div class="amendment-source">Source: Round 2 &amp; Round 3 Feedback</div>' : ''}
         <div class="test-actions">
           <button class="btn btn-pass ${s.status==='pass'?'active':''}" data-action="pass" data-key="${key}">&#10003; Pass</button>
           <button class="btn btn-fail ${s.status==='fail'?'active':''}" data-action="fail" data-key="${key}">&#10007; Fail</button>
@@ -1168,13 +1239,14 @@ function render() {
 // EXPORT
 // ============================================================
 function exportCSV() {
-  let csv = 'Section,TC ID,Test Case,Status,Priority,New/Amended,Notes\n';
+  let csv = 'Section,TC ID,Test Case,Status,Priority,Source,Notes\n';
   SECTIONS.forEach(s => {
     s.tests.forEach(t => {
       const key = s.id + '_' + t.tc;
       const st = state[key] || {};
       const notes = (st.notes || '').replace(/"/g, '""');
-      csv += `"${s.code}","${t.tc}","${t.name}","${st.status || 'pending'}","${t.priority || ''}","${t.isNew ? 'NEW' : ''}","${notes}"\n`;
+      const source = t.source || (t.isNew ? 'Amends' : 'Original');
+      csv += `"${s.code}","${t.tc}","${t.name}","${st.status || 'pending'}","${t.priority || ''}","${source}","${notes}"\n`;
     });
   });
   download(csv, 'WFP_UAT_Results_' + new Date().toISOString().slice(0,10) + '.csv', 'text/csv');
@@ -1187,7 +1259,7 @@ function exportJSON() {
     s.tests.forEach(t => {
       const key = s.id + '_' + t.tc;
       const st = state[key] || {};
-      sectionData.tests.push({ tc: t.tc, name: t.name, status: st.status || 'pending', notes: st.notes || '', isNew: !!t.isNew, priority: t.priority || '' });
+      sectionData.tests.push({ tc: t.tc, name: t.name, status: st.status || 'pending', notes: st.notes || '', isNew: !!t.isNew, priority: t.priority || '', source: t.source || '' });
     });
     data.sections.push(sectionData);
   });
